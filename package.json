@@ -4,8 +4,8 @@
   "description": "create a backend server for realtime chat app",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "nodemon --inspect index.js"
   },
   "keywords": [
     "nodejs",
@@ -20,7 +20,9 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "helmet": "^5.1.0",
     "mongoose": "^6.4.0",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "pug": "^3.0.2"
   }
 }

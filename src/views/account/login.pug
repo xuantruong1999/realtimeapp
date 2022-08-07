@@ -1,0 +1,40 @@
+extend ../shared/layout
+
+block layout-content
+    form.container.mx-auto
+        //-- Email input
+        .form-outline.mb-4
+            input#form2Example1.form-control(type='email')
+            label.form-label(for='form2Example1') Email address
+        //-- Password input
+        .form-outline.mb-4
+            input#form2Example2.form-control(type='password')
+            label.form-label(for='form2Example2') Password
+        //-- 2 column grid layout for inline styling
+        .row.mb-4
+            .col.d-flex.justify-content-center
+            //-- Checkbox
+            .form-check
+                input#form2Example31.form-check-input(type='checkbox' value='' checked='')
+                label.form-check-label(for='form2Example31')  Remember me 
+            .col
+            //-- Simple link
+            a(href='#!') Forgot password?
+        //-- Submit button
+        button.btn.btn-primary.btn-block.mb-4(type='button') Sign in
+        //-- Register buttons
+        .text-center
+            p
+            | Not a member? 
+            a(href='#!') Register
+            p or sign up with:
+            button.btn.btn-link.btn-floating.mx-1(type='button')
+            i.fab.fa-facebook-f
+            button.btn.btn-link.btn-floating.mx-1(type='button')
+            i.fab.fa-google
+            button.btn.btn-link.btn-floating.mx-1(type='button')
+            i.fab.fa-twitter
+            button.btn.btn-link.btn-floating.mx-1(type='button')
+            i.fab.fa-github
+
+
