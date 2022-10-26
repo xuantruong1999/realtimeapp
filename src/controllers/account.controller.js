@@ -8,12 +8,19 @@ const signup = (req, res) => {
     res.render('account/signup.pug', { title: "Sign Up!" })
 }
 
-const create = (req, res) => {
+const create = async (req, res, next) => {
     try {
-        const newUser = new User(req.body)
-        newUser.Save(err => {
-            throw err;
-        })
+        var userParam = req.body;
+       
+        let user = await User.create({
+            username: userParam.username,
+            email: userParam.email,
+            password: userParam.password,
+            confirmpassword: userParam.confirmpassword
+        });
+
+        res.json({user});
+
     } catch (err) {
         next(err);
     }
