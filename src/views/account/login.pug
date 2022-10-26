@@ -1,15 +1,15 @@
 extend ../shared/layout
 
 block layout-content
-    form.container.mx-auto.w-50
+    form.container.mx-auto.w-50(action="/account/login" method="POST")
         h1.form-group.mb-4.text-center Login 
-        //-- Email input
+        //-- user name input
         .form-outline.mb-4
-            input#form2Example1.form-control(type='email')
-            label.form-label(for='form2Example1') Email address
+            input#form2Example1.form-control(type='text' name='username')
+            label.form-label(for='form2Example1') User Name 
         //-- Password input
         .form-outline.mb-4
-            input#form2Example2.form-control(type='password')
+            input#form2Example2.form-control(type='password' name='password')
             label.form-label(for='form2Example2') Password
         //-- 2 column grid layout for inline styling
         .row.mb-4
@@ -22,7 +22,7 @@ block layout-content
                 //-- Simple link
                 a(href='#!') Forgot password?
         //-- Submit button
-        button.btn.btn-primary.btn-block.mb-4(type='button') Sign in
+        button.btn.btn-primary.btn-block.mb-4(type='submit') Sign in
         //-- Register buttons
         .text-center
             p

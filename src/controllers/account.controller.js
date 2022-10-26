@@ -4,6 +4,18 @@ const login = (req, res) => {
     res.render('account/login.pug', { title: "Login Page" });
 }
 
+const authen = async (req, res) => {
+    debugger
+    let userInfor = req.body;
+    var user = await User.findOne({ username: userInfor.username, password: userInfor.password }).exec();
+
+    if (!user) {
+        res.send("user have not existed");
+    } else {
+        res.render('home/index.pug', { title: "Home" });
+    }
+}
+
 const signup = (req, res) => {
     res.render('account/signup.pug', { title: "Sign Up!" })
 }
@@ -11,7 +23,7 @@ const signup = (req, res) => {
 const create = async (req, res, next) => {
     try {
         var userParam = req.body;
-       
+
         let user = await User.create({
             username: userParam.username,
             email: userParam.email,
@@ -19,7 +31,7 @@ const create = async (req, res, next) => {
             confirmpassword: userParam.confirmpassword
         });
 
-        res.json({user});
+        res.json({ user });
 
     } catch (err) {
         next(err);
@@ -29,5 +41,6 @@ const create = async (req, res, next) => {
 module.exports = {
     login,
     signup,
-    create
+    create,
+    authen
 }
