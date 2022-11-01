@@ -9,7 +9,7 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const path = require('path');
 const cors = require('cors');
-
+var cookieSession = require('cookie-session')
 const homeRouter = require('./src/routes/home.route');
 const accountRouter = require('./src/routes/account.route');
 
@@ -27,6 +27,13 @@ app.use(helmet({
   contentSecurityPolicy: false
 }));
 
+app.use(cookieSession({
+  keys: ['halu ha 454564'],
+  expires: new Date(Date.now() + 3600),
+  // Cookie Options
+  maxAge: 60 * 60 * 1000 
+}));
+
 app.use(morgan("combined"));
 app.use(compression());
 
@@ -42,12 +49,13 @@ app.use((req, res, next) => {
   res.status(404).send("Sorry can't find that!")
 })
 
+//Error Handling
 app.use((err, req, res, next) => {
   console.error(err.stack)
   res.status(500).send(err.stack)
 })
 
-//
+//db
 mongoose
   .connect(process.env.CONNECTION_URI, {
     connectTimeoutMS: 5000,
@@ -63,4 +71,3 @@ mongoose
 app.listen(port, () => {
   console.log(`RealTime App listening on port ${port}`);
 });
-  

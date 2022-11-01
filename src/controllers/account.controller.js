@@ -1,18 +1,31 @@
 const User = require('../models/user.model');
+const helper = require('../helpers/helper');
 
 const login = (req, res) => {
     res.render('account/login.pug', { title: "Login Page" });
 }
 
+const signout = async (req, res) => {
+    req.session = null;
+}
+
 const authen = async (req, res) => {
-    debugger
     let userInfor = req.body;
-    var user = await User.findOne({ username: userInfor.username, password: userInfor.password }).exec();
+    var user = await User.findOne({ username: userInfor.username }).exec();
 
     if (!user) {
-        res.send("user have not existed");
+        res.render('account/login.pug', { message: "username or password is incorrect" });
     } else {
-        res.render('home/index.pug', { title: "Home" });
+        let isMatch = helper.hasher(userInfor.password, user.salt) === user.password;
+        if (isMatch) {
+            req.session.user = {isAuth: true, username: user.username};
+            let session = req.session.user;
+            debugger
+            res.render('home/index.pug', { title: "Home", session });
+        }
+        else {
+            res.render('account/login.pug', { message: "password is incorrect" });
+        }
     }
 }
 
@@ -22,16 +35,28 @@ const signup = (req, res) => {
 
 const create = async (req, res, next) => {
     try {
-        var userParam = req.body;
+        var { username, email, password, confirmpassword } = req.body;
+        var isExstied = await User.findOne({ email, username });
 
+        if (confirmpassword !== password) {
+            return res.render('account/signup.pug', { errMessage: "Password confirm is not match" })
+        }
+
+        if (isExstied) {
+            return res.render('account/signup', { inforMessage: "User have been exist" });
+        }
+
+        //hash password
+        let salt = helper.generateSalt(12);
+        let passwordHash = helper.hasher(password, salt);
         let user = await User.create({
-            username: userParam.username,
-            email: userParam.email,
-            password: userParam.password,
-            confirmpassword: userParam.confirmpassword
+            username: username,
+            email: email,
+            password: passwordHash,
+            salt: salt
         });
 
-        res.json({ user });
+        res.render('account/login');
 
     } catch (err) {
         next(err);
@@ -42,5 +67,6 @@ module.exports = {
     login,
     signup,
     create,
-    authen
+    authen,
+    signout
 }
