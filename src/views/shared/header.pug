@@ -5,8 +5,8 @@
         a.p-2.text-decoration-none.text-dark(href='#') Support
         a.p-2.text-decoration-none.text-dark(href='#') Pricing
         a.p-2.text-decoration-none.text-dark(href='#') Features
-    if okla && okla.username
-        div #{okla.username}
+    if session && session.username
+        div #{session.username}
     else
         div
             a.m-2.btn.btn-outline-primary(href='/account/signup') Sign up

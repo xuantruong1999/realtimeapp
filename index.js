@@ -12,6 +12,7 @@ const cors = require('cors');
 var cookieSession = require('cookie-session')
 const homeRouter = require('./src/routes/home.route');
 const accountRouter = require('./src/routes/account.route');
+const {authen} = require('./src/middlewares/authentication');
 
 //setting view mapping with the template engine pug
 app.use(express.static(path.join(__dirname, 'public')));
@@ -30,6 +31,7 @@ app.use(helmet({
 app.use(cookieSession({
   keys: ['halu ha 454564'],
   expires: new Date(Date.now() + 3600),
+  httpOnly: false,
   // Cookie Options
   maxAge: 60 * 60 * 1000 
 }));
@@ -48,6 +50,7 @@ app.use('/account', accountRouter)
 app.use((req, res, next) => {
   res.status(404).send("Sorry can't find that!")
 })
+
 
 //Error Handling
 app.use((err, req, res, next) => {

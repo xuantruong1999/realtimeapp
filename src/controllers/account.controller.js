@@ -20,7 +20,7 @@ const authen = async (req, res) => {
         if (isMatch) {
             req.session.user = {isAuth: true, username: user.username};
             res.render('home/index.pug', {
-                okla: req.session.user
+                session: req.session.user
             });
         }
         else {
