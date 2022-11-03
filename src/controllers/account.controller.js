@@ -19,9 +19,9 @@ const authen = async (req, res) => {
         let isMatch = helper.hasher(userInfor.password, user.salt) === user.password;
         if (isMatch) {
             req.session.user = {isAuth: true, username: user.username};
-            let session = req.session.user;
-            debugger
-            res.render('home/index.pug', { title: "Home", session });
+            res.render('home/index.pug', {
+                okla: req.session.user
+            });
         }
         else {
             res.render('account/login.pug', { message: "password is incorrect" });
