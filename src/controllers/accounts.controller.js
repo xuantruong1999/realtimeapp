@@ -44,15 +44,9 @@ const create = async (req, res, next) => {
         if (await User.findOne({ username })) {
             return res.render('account/signup.pug', { errMessage: "Username have been exsted" })
         }
-
-        var isExstied = await User.findOne({ email, username });
-        
+              
         if (confirmpassword !== password) {
             return res.render('account/signup.pug', { errMessage: "Password confirm is not match" })
-        }
-
-        if (isExstied) {
-            return res.render('account/signup', { inforMessage: "User have been exist" });
         }
 
         //hash password
