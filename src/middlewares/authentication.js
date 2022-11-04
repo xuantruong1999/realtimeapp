@@ -6,8 +6,7 @@ const authen = (req, res, next) => {
       return res.status(401).send("Unauthorized");
     }
   }
-
-
+  
   module.exports = {
     authen
   }

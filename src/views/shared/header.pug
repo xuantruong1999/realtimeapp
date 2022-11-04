@@ -6,7 +6,12 @@
         a.p-2.text-decoration-none.text-dark(href='#') Pricing
         a.p-2.text-decoration-none.text-dark(href='#') Features
     if session && session.username
-        div #{session.username}
+        div.dropdown
+            button.btn.btn-secondary.dropdown-toggle(type="button" data-bs-toggle="dropdown" aria-expanded="false") #{session.username}
+            ul.dropdown-menu
+                li 
+                    a.dropdown-item(href="/users/profile") Profile 
+                    a.dropdown-item(href="/account/logout") Log Out 
     else
         div
             a.m-2.btn.btn-outline-primary(href='/account/signup') Sign up
