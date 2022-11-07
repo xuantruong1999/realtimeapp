@@ -13,13 +13,14 @@ var cookieSession = require('cookie-session')
 const homeRouter = require('./src/routes/home.route');
 const accountsRouter = require('./src/routes/accounts.route');
 const usersRouter = require('./src/routes/users.route');
-const {authen} = require('./src/middlewares/authentication');
+const { authen } = require('./src/middlewares/authentication');
 var cookieParser = require('cookie-parser');
 
 //setting view mapping with the template engine pug
 app.use(express.static(path.join(__dirname, 'public')));
 app.set("views", path.join(__dirname, 'src/views'));
 app.set('view engine', 'pug');
+app.use('/assets', express.static(__dirname + '/src/assets/'));
 app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css/')); // redirect CSS bootstrap
 app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js/')); // redirect CSS bootstrap
 
@@ -35,11 +36,11 @@ app.use(cookieSession({
   expires: new Date(Date.now() + 3600),
   httpOnly: true,
   // Cookie Options
-  maxAge: 60 * 60 * 1000 
+  maxAge: 60 * 60 * 1000
 }));
 
 //Specified for development env
-if(process.env.ENV === "Development"){
+if (process.env.ENV === "Development") {
   app.use(morgan("combined"));
 }
 app.use(compression());
@@ -52,7 +53,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //routers
 app.use('/', homeRouter);
 app.use('/account', accountsRouter);
-app.use('/users',authen, usersRouter);
+app.use('/users', authen, usersRouter);
 
 app.use((req, res, next) => {
   res.status(404).send("Sorry can't find that!")
