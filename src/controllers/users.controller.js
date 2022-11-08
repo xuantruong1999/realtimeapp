@@ -1,6 +1,6 @@
-const UserModel = require('../models/user.model');
+const { UserModel, ProfileModel, AddressModel } = require('../models/user.model');
 
-const index = async (req, res) => {
+const index = async (req, res, next) => {
     try {
         if (req.session && req.session.user) {
             let userId = req.session.user.id;
@@ -25,24 +25,27 @@ const update = async (req, res, next) => {
     try {
         let id = req.session.user.id;
         let updateObj = req.body;
-        let profileObj = {
+
+        let profile = await ProfileModel.create({
             firstName: updateObj.firstName,
             lastName: updateObj.lastName,
             bio: updateObj.bio,
             phone: updateObj.phone,
-        };
+        });
 
-        let addressObj = {
+        let address = await AddressModel.create({
             street: updateObj.street,
             city: updateObj.city,
             state: updateObj.state,
             zipCode: updateObj.zipCode,
-        }
-        var user = await UserModel.findOneAndUpdate({_id: id}, {profile: profileObj, address: addressObj}, {
-            new: true
+        })
+
+        var user = await UserModel.findOneAndUpdate({ _id: id }, { email: updateObj.email, profile: profile, address: address }, {
+            new: true,
+            runValidators: true
         });
 
-        res.render('users/index.pug', { title: "Profile", user, session: req.session.user } )
+        res.render('users/index.pug', { title: "Profile", user, session: req.session.user })
 
     } catch (error) {
         next(error);

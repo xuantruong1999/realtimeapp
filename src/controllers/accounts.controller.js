@@ -1,4 +1,4 @@
-const User = require('../models/user.model');
+const { UserModel } = require('../models/user.model');
 const helper = require('../helpers/helper');
 
 const login = (req, res) => {
@@ -12,7 +12,7 @@ const logout = async (req, res) => {
 
 const authen = async (req, res) => {
     let userInfor = req.body;
-    var user = await User.findOne({ username: userInfor.username }).exec();
+    var user = await UserModel.findOne({ username: userInfor.username }).exec();
 
     if (!user) {
         res.render('account/login.pug', { message: "username or password is incorrect" });
@@ -53,7 +53,7 @@ const create = async (req, res, next) => {
         //hash password
         let salt = helper.generateSalt(12);
         let passwordHash = helper.hasher(password, salt);
-        await User.create({
+        await UserModel.create({
             username: username,
             email: email,
             password: passwordHash,
