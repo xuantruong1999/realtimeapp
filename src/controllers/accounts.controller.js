@@ -42,11 +42,11 @@ const create = async (req, res, next) => {
         }
 
         var { username, email, password, confirmpassword } = req.body;
-        if (await User.findOne({ email })) {
+        if (await UserModel.findOne({ email })) {
             return res.render('account/signup.pug', { errMessage: "Email have been exsted" })
         }
 
-        if (await User.findOne({ username })) {
+        if (await UserModel.findOne({ username })) {
             return res.render('account/signup.pug', { errMessage: "Username have been exsted" })
         }
 
