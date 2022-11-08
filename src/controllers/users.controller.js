@@ -45,7 +45,7 @@ const update = async (req, res, next) => {
             runValidators: true
         });
 
-        res.render('users/index.pug', { title: "Profile", user, session: req.session.user })
+        res.render('users/index.pug', { title: "Profile Updated", user, session: req.session.user })
 
     } catch (error) {
         next(error);
