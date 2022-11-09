@@ -1,0 +1,71 @@
+extends ../shared/layout
+
+block append styles 
+    link(rel="stylesheet" href="/assets/css/users/index.css")
+block layout-content
+
+    - var profile = user.profile
+    - var address = user.address
+    form.container(action='/users/update', method='POST')
+        .row.gutters
+            .col-xl-3.col-lg-3.col-md-12.col-sm-12.col-12
+                .card.h-100
+                    .card-body
+                        .account-settings
+                            .user-profile
+                                .user-avatar
+                                    img(src='/images/profile-picture-default-png.png' alt='Maxwell Admin')
+                                if user && profile
+                                    h5.user-name #{user.firstName} #{user.lastName} 
+                                h6.user-email #{user.email}
+                                if user && profile
+                                    .about
+                                        h5 About
+                                        p
+                                            | #{profile.bio}
+            .col-xl-9.col-lg-9.col-md-12.col-sm-12.col-12
+                .card.h-100
+                    .card-body
+                        .row.gutters
+                            .col-xl-12.col-lg-12.col-md-12.col-sm-12.col-12
+                                h6.mb-2.text-primary Personal Details
+                            .col-xl-6.col-lg-6.col-md-6.col-sm-6.col-12
+                                .form-group
+                                    label(for='firstName') First Name
+                                    input#fullName.form-control(type='text' placeholder='Enter first name' name='firstName' value=profile.firstName)
+                                .form-group
+                                    label(for='lastName') Last Name
+                                    input#fullName.form-control(type='text' placeholder='Enter last name' name='lastName' value=profile.lastName)
+                            .col-xl-6.col-lg-6.col-md-6.col-sm-6.col-12
+                                .form-group
+                                    label(for='email') Email
+                                    input#eMail.form-control(type='email' placeholder='Enter email ID' name='email' value=user.email)
+                                .form-group
+                                    label(for='phone') Phone
+                                    input#phone.form-control(type='text' placeholder='Enter phone number' name='phone' value=profile.phone)
+                            .col-xl-6.col-lg-6.col-md-6.col-sm-6.col-12
+                                .form-group
+                                    label(for='bio') Bio
+                                    textarea#bio.form-control(rows="4" cols="50" type='text' placeholder='Tell something about yourself' name='bio') #{profile.bio}
+                            .row.gutters
+                                .col-xl-12.col-lg-12.col-md-12.col-sm-12.col-12
+                                    h6.mt-3.mb-2.text-primary Address
+                                .col-xl-6.col-lg-6.col-md-6.col-sm-6.col-12
+                                    .form-group
+                                        label(for='Street') Street
+                                        input#Street.form-control(type='text' placeholder='Enter Street' name='street' value=address.street)
+                                .col-xl-6.col-lg-6.col-md-6.col-sm-6.col-12
+                                    .form-group
+                                        label(for='city') City
+                                        input#ciTy.form-control(type='text' placeholder='Enter City' name='city' value=address.city)
+                                .col-xl-6.col-lg-6.col-md-6.col-sm-6.col-12
+                                    .form-group
+                                        label(for='state') State
+                                        input#sTate.form-control(type='text' placeholder='Enter State' name='state' value=address.state)
+                                .col-xl-6.col-lg-6.col-md-6.col-sm-6.col-12
+                                    .form-group
+                                        label(for='zipCode') Zip Code
+                                        input#zIp.form-control(type='number' placeholder='Zip Code' name='zipCode' value=address.zipCode)
+                        .row.gutters.mt-2
+                            .col-xl-12.col-lg-12.col-md-12.col-sm-12.col-12
+                                button#submit.btn.btn-primary(type='submit' name='submit') Update

@@ -3,6 +3,10 @@ extend ../shared/layout
 block layout-content 
     section.vh-80
         .container.h-80
+            if errMessage
+                div.alert.alert-danger(role="alert") #{errMessage}
+            if inforMessage
+                div.alert.alert-primary(role="alert") #{inforMessage}
             .row.d-flex.justify-content-center.align-items-center.h-100
                 .col-lg-12.col-xl-11
                     .card.text-black(style='border-radius: 25px;')

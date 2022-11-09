@@ -1,12 +1,7 @@
 const index = function (req, res) {
-  res.render("home/index.pug", {title:"home page"});
+  var session = req.session != null ?  req.session.user : null;
+  res.render("home/index.pug", {title:"home page", session});
 };
-
-const showName = function (req, res) {
-  res.send(`<h1>Hello ${req.params.name}</h1>`);
-};
-
 module.exports = {
   index,
-  showName,
 };

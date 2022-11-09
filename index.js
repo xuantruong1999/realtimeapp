@@ -9,16 +9,21 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const path = require('path');
 const cors = require('cors');
-
+var cookieSession = require('cookie-session')
 const homeRouter = require('./src/routes/home.route');
-const accountRouter = require('./src/routes/account.route');
+const accountsRouter = require('./src/routes/accounts.route');
+const usersRouter = require('./src/routes/users.route');
+const { authen } = require('./src/middlewares/authentication');
+var cookieParser = require('cookie-parser');
+const expressValidator = require('express-validator');
 
 //setting view mapping with the template engine pug
 app.use(express.static(path.join(__dirname, 'public')));
 app.set("views", path.join(__dirname, 'src/views'));
 app.set('view engine', 'pug');
-app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css')); // redirect CSS bootstrap
-app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js')); // redirect CSS bootstrap
+app.use('/assets', express.static(__dirname + '/src/assets/'));
+app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css/')); // redirect CSS bootstrap
+app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js/')); // redirect CSS bootstrap
 
 //apply middlewares
 app.use(cors());
@@ -27,27 +32,43 @@ app.use(helmet({
   contentSecurityPolicy: false
 }));
 
-app.use(morgan("combined"));
+app.use(cookieSession({
+  keys: ['halu ha 454564'],
+  expires: new Date(Date.now() + 3600),
+  httpOnly: true,
+  // Cookie Options
+  maxAge: 60 * 60 * 1000
+}));
+
+//Specified for development env
+if (process.env.ENV === "Development") {
+  app.use(morgan("combined"));
+}
 app.use(compression());
 
 app.use(bodyParser.json());
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
-
+//app.use(expressValidator);
 
 //routers
+debugger
 app.use('/', homeRouter);
-app.use('/account', accountRouter)
+app.use('/account', accountsRouter);
+app.use('/users', authen, usersRouter);
 
 app.use((req, res, next) => {
   res.status(404).send("Sorry can't find that!")
 })
 
+
+//Error Handling
 app.use((err, req, res, next) => {
   console.error(err.stack)
   res.status(500).send(err.stack)
 })
 
-//
+//db
 mongoose
   .connect(process.env.CONNECTION_URI, {
     connectTimeoutMS: 5000,
@@ -59,8 +80,6 @@ mongoose
   })
   .catch((err) => console.log(`Can not connect to mongodb server with error: ${err}`));
 
-
 app.listen(port, () => {
   console.log(`RealTime App listening on port ${port}`);
 });
-  
