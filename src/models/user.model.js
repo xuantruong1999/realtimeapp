@@ -36,6 +36,7 @@ var AddressSchema = new mongoose.Schema({
     type: Number,
   }
 });
+
 var AddressModel = mongoose.model('Address', AddressSchema);
 
 var UserSchema = new mongoose.Schema({

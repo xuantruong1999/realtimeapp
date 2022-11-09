@@ -1,4 +1,6 @@
 const { UserModel, ProfileModel, AddressModel } = require('../models/user.model');
+const { validationResult } = require('express-validator');
+
 
 const index = async (req, res, next) => {
     try {
@@ -23,22 +25,27 @@ const index = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
         let id = req.session.user.id;
         let updateObj = req.body;
 
-        let profile = await ProfileModel.create({
+        let profile = {
             firstName: updateObj.firstName,
             lastName: updateObj.lastName,
             bio: updateObj.bio,
             phone: updateObj.phone,
-        });
+        };
 
-        let address = await AddressModel.create({
+        let address = {
             street: updateObj.street,
             city: updateObj.city,
             state: updateObj.state,
             zipCode: updateObj.zipCode,
-        })
+        };
 
         var user = await UserModel.findOneAndUpdate({ _id: id }, { email: updateObj.email, profile: profile, address: address }, {
             new: true,

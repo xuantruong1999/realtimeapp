@@ -1,5 +1,6 @@
 const { UserModel } = require('../models/user.model');
 const helper = require('../helpers/helper');
+const { validationResult } = require('express-validator');
 
 const login = (req, res) => {
     res.render('account/login.pug', { title: "Login Page" });
@@ -12,6 +13,12 @@ const logout = async (req, res) => {
 
 const authen = async (req, res) => {
     let userInfor = req.body;
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     var user = await UserModel.findOne({ username: userInfor.username }).exec();
 
     if (!user) {
@@ -36,10 +43,15 @@ const signup = (req, res) => {
 
 const create = async (req, res, next) => {
     try {
-
-        if (confirmpassword !== password) {
-            return res.render('account/signup.pug', { errMessage: "Password confirm is not match" })
+        
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
         }
+
+        // if (confirmpassword !== password) {
+        //     return res.render('account/signup.pug', { errMessage: "Password confirm is not match" })
+        // }
 
         var { username, email, password, confirmpassword } = req.body;
         if (await UserModel.findOne({ email })) {

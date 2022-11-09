@@ -15,6 +15,7 @@ const accountsRouter = require('./src/routes/accounts.route');
 const usersRouter = require('./src/routes/users.route');
 const { authen } = require('./src/middlewares/authentication');
 var cookieParser = require('cookie-parser');
+const expressValidator = require('express-validator');
 
 //setting view mapping with the template engine pug
 app.use(express.static(path.join(__dirname, 'public')));
@@ -48,9 +49,10 @@ app.use(compression());
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
-
+//app.use(expressValidator);
 
 //routers
+debugger
 app.use('/', homeRouter);
 app.use('/account', accountsRouter);
 app.use('/users', authen, usersRouter);
