@@ -22,7 +22,12 @@ let hasher = (password, salt) => {
 
 };
 
+let generateRandomToken = () => {
+    return crypto.randomBytes(32).toString('hex');
+};
+
 module.exports = {
     hasher,
-    generateSalt
+    generateSalt,
+    generateRandomToken
 }

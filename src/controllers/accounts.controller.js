@@ -13,7 +13,6 @@ const logout = async (req, res) => {
 
 const authen = async (req, res) => {
     let userInfor = req.body;
-
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
@@ -27,6 +26,17 @@ const authen = async (req, res) => {
         let isMatch = helper.hasher(userInfor.password, user.salt) === user.password;
         if (isMatch) {
             req.session.user = { isAuth: true, username: user.username, id: user.id };
+           
+            if (userInfor.rememberme) {
+                let token = helper.generateRandomToken();
+                let userUpdated = await UserModel.findOneAndUpdate({ _id: user._id }, { remembermeToken: token }, {
+                    new: true
+                });
+                //expired a week
+                res.cookie('remembermeToken', userUpdated.remembermeToken, { expires: new Date(Date.now() + 24 * 7 * 3600000), httpOnly: true })
+                res.cookie('randomNumber', userUpdated.id, { expires: new Date(Date.now() + 24 * 7 * 3600000), httpOnly: true })
+            }
+
             res.render('home/index.pug', {
                 session: req.session.user
             });
@@ -43,7 +53,7 @@ const signup = (req, res) => {
 
 const create = async (req, res, next) => {
     try {
-        
+
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });

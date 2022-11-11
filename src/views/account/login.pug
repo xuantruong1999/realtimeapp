@@ -15,21 +15,18 @@ block layout-content
             label.form-label(for='form2Example2') Password
         //-- 2 column grid layout for inline styling
         .row.mb-4
-            .col.d-flex.justify-content-center
+            .col
                 //-- Checkbox
                 .form-check
-                    input#form2Example31.form-check-input(type='checkbox' value='' checked='')
+                    input#form2Example31.form-check-input(type='checkbox' name='rememberme')
                     label.form-check-label(for='form2Example31')  Remember me 
-            .col
-                //-- Simple link
-                a(href='#!') Forgot password?
         //-- Submit button
         button.btn.btn-primary.btn-block.mb-4(type='submit') Sign in
         //-- Register buttons
         .text-center
             p
             | Not a member? 
-            a(href='#!') Register
+            a(href='/account/signup') Register
             p or sign up with:
             button.btn.btn-link.btn-floating.mx-1(type='button')
             i.fab.fa-facebook-f

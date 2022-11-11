@@ -66,6 +66,9 @@ var UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  remembermeToken: {
+    type: String,
+  },
   profile: ProfileSchema,
   address: AddressSchema,
 },

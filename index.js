@@ -22,8 +22,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set("views", path.join(__dirname, 'src/views'));
 app.set('view engine', 'pug');
 app.use('/assets', express.static(__dirname + '/src/assets/'));
-app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css/')); // redirect CSS bootstrap
-app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js/')); // redirect CSS bootstrap
+app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css/')); 
+app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js/')); 
 
 //apply middlewares
 app.use(cors());
@@ -49,10 +49,8 @@ app.use(compression());
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
-//app.use(expressValidator);
 
 //routers
-debugger
 app.use('/', homeRouter);
 app.use('/account', accountsRouter);
 app.use('/users', authen, usersRouter);
