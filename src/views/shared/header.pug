@@ -1,18 +1,25 @@
+if res && res.req
+    - var name =  res.req.cookies['name'];
+else 
+    - var name = username;
 .d-flex.flex-row-flex-md-row.align-items-center.justify-content-between.p-3.px-md-4.mb-3.bg-white.border-bottom.box-shadow
-    h5.my-0.mr-md-auto.font-weight-normal RealChatApp
+    h5.my-0.mr-md-auto.font-weight-normal  
+        a.text-decoration-none(href='/') RealChatApp
     nav.my-2.my-md-0.mr-md-3
         a.p-2.text-decoration-none.text-dark(href='#') Enterprise
         a.p-2.text-decoration-none.text-dark(href='#') Support
         a.p-2.text-decoration-none.text-dark(href='#') Pricing
         a.p-2.text-decoration-none.text-dark(href='#') Features
-    if session && session.username
-        div.dropdown
-            button.btn.btn-secondary.dropdown-toggle(type="button" data-bs-toggle="dropdown" aria-expanded="false") #{session.username}
-            ul.dropdown-menu
-                li 
-                    a.dropdown-item(href="/users") Profile 
-                    a.dropdown-item(href="/account/logout") Log Out 
-    else
-        div
-            a.m-2.btn.btn-outline-primary(href='/account/signup') Sign up
-            a.btn.btn-outline-primary(href='/account/login') Login
+    #header-nav
+        if name
+            div.dropdown
+                button.btn.btn-secondary.dropdown-toggle(type="button" data-bs-toggle="dropdown" aria-expanded="false") #{name}
+                ul.dropdown-menu
+                    li 
+                        a.dropdown-item(href="/users") Profile 
+                        a.dropdown-item(href="/account/logout") Log Out
+        else 
+            div
+                a.m-2.btn.btn-outline-primary(href='/account/signup') Sign up
+                a.btn.btn-outline-primary(href='/account/login') Login
+script(src="/assets/js/common.js") 

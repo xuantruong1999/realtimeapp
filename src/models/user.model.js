@@ -20,7 +20,7 @@ var ProfileSchema = new mongoose.Schema({
   }
 });
 
-var ProfileModel = mongoose.model('Profile', ProfileSchema);
+//var ProfileModel = mongoose.model('Profile', ProfileSchema);
 
 var AddressSchema = new mongoose.Schema({
   street: {
@@ -37,7 +37,7 @@ var AddressSchema = new mongoose.Schema({
   }
 });
 
-var AddressModel = mongoose.model('Address', AddressSchema);
+//var AddressModel = mongoose.model('Address', AddressSchema);
 
 var UserSchema = new mongoose.Schema({
   email: {
@@ -76,4 +76,4 @@ var UserSchema = new mongoose.Schema({
 );
 
 var UserModel = mongoose.model('User', UserSchema);
-module.exports = { UserModel, ProfileModel, AddressModel };
+module.exports = { UserModel };

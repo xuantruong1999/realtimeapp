@@ -13,9 +13,8 @@ var cookieSession = require('cookie-session')
 const homeRouter = require('./src/routes/home.route');
 const accountsRouter = require('./src/routes/accounts.route');
 const usersRouter = require('./src/routes/users.route');
-const { authen } = require('./src/middlewares/authentication');
+const { authenMiddware } = require('./src/middlewares/authentication');
 var cookieParser = require('cookie-parser');
-const expressValidator = require('express-validator');
 
 //setting view mapping with the template engine pug
 app.use(express.static(path.join(__dirname, 'public')));
@@ -33,7 +32,8 @@ app.use(helmet({
 }));
 
 app.use(cookieSession({
-  keys: ['halu ha 454564'],
+  //secure: true,
+  keys: [process.env.SECRETKEY1],
   expires: new Date(Date.now() + 3600),
   httpOnly: true,
   // Cookie Options
@@ -53,7 +53,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //routers
 app.use('/', homeRouter);
 app.use('/account', accountsRouter);
-app.use('/users', authen, usersRouter);
+app.use('/users', authenMiddware, usersRouter);
 
 app.use((req, res, next) => {
   res.status(404).send("Sorry can't find that!")
