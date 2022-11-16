@@ -37,7 +37,7 @@ app.use(cookieSession({
   expires: new Date(Date.now() + 3600),
   httpOnly: true,
   // Cookie Options
-  maxAge: 60 * 60 * 1000
+  maxAge: 60 * 60 * 1000 // force expired 1 hour
 }));
 
 //Specified for development env
