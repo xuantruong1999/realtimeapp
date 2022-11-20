@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 
 var ProfileSchema = new mongoose.Schema({
-  avatar: { type: String, default: 'profile-picture-default.png' },
+  avatar: { type: String, default: 'profile-picture-default.jpg' },
   firstName: { type: String },
   lastName: { type: String },
   bio: {

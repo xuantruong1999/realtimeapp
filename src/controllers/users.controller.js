@@ -2,7 +2,7 @@ const { UserModel } = require("../models/user.model");
 const { validationResult } = require("express-validator");
 const { unlink } = require("node:fs/promises");
 const ObjectId = require("mongoose").Types.ObjectId;
-
+const fs = require("fs");
 const index = async (req, res, next) => {
   try {
     let userId;
@@ -26,7 +26,6 @@ const index = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   try {
-    debugger;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -35,10 +34,10 @@ const update = async (req, res, next) => {
     let userId = req.session.user.id;
     let updateObj = req.body;
     let avatar = null;
-    if (req.file && req.file.filename) {
-      avatar = req.file.filename;
-      deletePreProfileAvatar(userId, req.file.filename);
-    }
+
+    let query = await UserModel.findById(userId)
+      .select("profile.avatar")
+      .exec();
 
     let profile = {
       //avatar
@@ -48,9 +47,21 @@ const update = async (req, res, next) => {
       phone: updateObj.phone,
     };
 
-    if(avatar){
-      profile.avatar = avatar;
-      
+    //replace profile.avatar logic
+    if (req.file && req.file.filename) {
+      avatar = req.file.filename;
+
+      if (avatar) {
+        // action updated avatar
+        profile.avatar = avatar;
+        deletePreProfileAvatar(userId, query.profile.avatar);
+      }
+    }
+    else{
+      if (query && query.profile) {
+        //hasn't update avatar
+        profile.avatar = query.profile.avatar;
+      }
     }
 
     let address = {
@@ -75,24 +86,27 @@ const update = async (req, res, next) => {
   }
 };
 
-const deletePreProfileAvatar = async function(userId, filename){
-  if(!userId && !ObjectId.isValid(userId)){
+const deletePreProfileAvatar = async function (userId, filename) {
+  if (!filename) return;
+
+  if (!fs.existsSync(`./public/images/${filename}`)) {
     return;
   }
 
-  if(filename) return;
+  if (!userId || !ObjectId.isValid(userId)) {
+    return;
+  }
 
-  UserModel.findById(userId).exec(function (err, user) {
+  await UserModel.findById(userId).exec(function (err, user) {
     if (err) return next(err);
     try {
       let profile = user.profile;
-      let avatarDefault = 'profile-picture-default.png';
+      let avatarDefault = "profile-picture-default.jpg";
       if (profile) {
-        if(profile.avatar !== avatarDefault){
+        if (profile.avatar !== avatarDefault) {
           unlink(`./public/images/${filename}`);
           console.log("successfully deleted: " + filename);
         }
-        
       }
     } catch (err) {
       throw err;
@@ -100,5 +114,5 @@ const deletePreProfileAvatar = async function(userId, filename){
   });
 
   return filename;
-}
+};
 module.exports = { index, update };
