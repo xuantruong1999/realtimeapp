@@ -27,7 +27,6 @@ const logout = async (req, res) => {
 
 const authen = async (req, res) => {
   let userInfor = req.body;
-  debugger
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
