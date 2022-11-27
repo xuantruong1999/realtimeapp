@@ -1,7 +1,7 @@
 if res && res.req
     - var name =  res.req.cookies['name'];
 else if username 
-    - var name = username;
+    - var name = username 
 .d-flex.flex-row-flex-md-row.align-items-center.justify-content-between.p-3.px-md-4.mb-3.bg-white.border-bottom.box-shadow
     h5.my-0.mr-md-auto.font-weight-normal  
         a.text-decoration-none(href='/') RealChatApp
@@ -17,6 +17,7 @@ else if username
                 ul.dropdown-menu
                     li 
                         a.dropdown-item(href="/users") Profile 
+                        a.dropdown-item(href="/users/messages") Chat 
                         a.dropdown-item(href="/account/logout") Log Out
         else 
             div

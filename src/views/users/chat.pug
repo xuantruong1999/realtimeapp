@@ -1,0 +1,10 @@
+extends ../shared/layout
+
+block layout-content
+    ul#messages 
+    form#form-chat
+        div
+            input.form-control#chatbox(type="text") 
+            button#btn-chatbox.btn.btn-primary.mt-2(type="submit") Submit
+    script(src="/socket.io/socket.io.js" type="text/javascript")
+    script(src="/assets/js/chat.js")

@@ -15,5 +15,11 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 router.get("/", usersController.index);
-router.post("/update", upload.single('avatar'),validator.validateUserUpdate(), usersController.update);
+router.get("/messages", usersController.chatMessage);
+router.post(
+  "/update",
+  upload.single("avatar"),
+  validator.validateUserUpdate(),
+  usersController.update
+);
 module.exports = router;

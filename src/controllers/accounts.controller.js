@@ -44,12 +44,11 @@ const authen = async (req, res) => {
     if (isMatch) {
       req.session.user = { isAuth: true, id: user.id };
 
-      res.cookie("name", user.username);
       if (userInfor.rememberme) {
         let token = helper.generateRandomToken();
         let userUpdated = await UserModel.findByIdAndUpdate(
           user.id,
-          { remembermeToken: token }, 
+          { remembermeToken: token },
           {
             new: true,
           }
@@ -64,8 +63,10 @@ const authen = async (req, res) => {
         res.cookie("name", user.username, {
           expires: new Date(Date.now() + 24 * 7 * 3600000),
         });
-        
-        return res.render("home/index.pug", { username: userUpdated.username });
+
+        return res.render("home/index.pug", res);
+      } else {
+        res.cookie("name", user.username);
       }
       res.render("home/index.pug", { username: user.username });
     } else {

@@ -3,6 +3,7 @@ const { validationResult } = require("express-validator");
 const { unlink } = require("node:fs/promises");
 const ObjectId = require("mongoose").Types.ObjectId;
 const fs = require("fs");
+
 const index = async (req, res, next) => {
   try {
     let userId;
@@ -56,8 +57,7 @@ const update = async (req, res, next) => {
         profile.avatar = avatar;
         deletePreProfileAvatar(userId, query.profile.avatar);
       }
-    }
-    else{
+    } else {
       if (query && query.profile) {
         //hasn't update avatar
         profile.avatar = query.profile.avatar;
@@ -115,4 +115,9 @@ const deletePreProfileAvatar = async function (userId, filename) {
 
   return filename;
 };
-module.exports = { index, update };
+
+const chatMessage = function (req, res, next) {
+  debugger;
+  res.render("users/chat.pug", { title: "Chat Message", res });
+};
+module.exports = { index, update, chatMessage };
