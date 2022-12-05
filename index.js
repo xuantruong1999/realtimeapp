@@ -16,6 +16,7 @@ const accountsRouter = require("./src/routes/accounts.route");
 const usersRouter = require("./src/routes/users.route");
 const { authenMiddware } = require("./src/middlewares/authentication");
 const cookieParser = require("cookie-parser");
+const registerUserHandler = require("./src/socketHandlers/regiesterUserHandler");
 const { Server } = require("socket.io");
 
 const io = new Server(httpServer);
@@ -77,18 +78,13 @@ app.use((err, req, res, next) => {
   res.status(500).send(err.stack);
 });
 
-io.on("connection", (socket) => {
-  console.log("a user connected with socket: ", socket);
-
-  socket.on("hello", (arg) => {
-    console.log("hello chanel: ", arg);
-    socket.emit("on-chat", arg);
-  });
-});
-
-io.on("disconnect", () => {
-  console.log("socket is disconnect");
-});
+//#region Socket.IO integrate
+const onConnection = function (socket) {
+  console.log(socket);
+  registerUserHandler(io, socket);
+};
+io.on("connection", onConnection);
+//#endregion
 
 mongoose
   .connect(process.env.CONNECTION_URI, {

@@ -1,0 +1,16 @@
+#chat {
+   
+}
+
+#user-selection {
+    background-color: #9b32a8;
+}
+
+ul#messages {
+    list-style: none;
+    min-height: 300px;
+}
+
+form#form-chat {
+    
+}
