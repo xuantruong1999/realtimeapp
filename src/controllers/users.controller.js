@@ -117,7 +117,6 @@ const deletePreProfileAvatar = async function (userId, filename) {
 };
 
 const chatMessage = function (req, res, next) {
-  debugger;
   res.render("users/chat.pug", { title: "Chat Message", res });
 };
 module.exports = { index, update, chatMessage };

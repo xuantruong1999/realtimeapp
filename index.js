@@ -79,10 +79,40 @@ app.use((err, req, res, next) => {
 });
 
 //#region Socket.IO integrate
+io.use((socket, next) => {
+  const username = socket.handshake.auth.username;
+  if (!username) {
+    return next(new Error("invalid username"));
+  }
+  socket.username = username;
+  next();
+});
+
 const onConnection = function (socket) {
-  console.log(socket);
+  //console.log(socket);
+  const users = [];
+
+  for (let [id, socket] of io.of("/").sockets) {
+    users.push({
+      username: socket.username,
+    });
+  }
+  io.sockets.emit("users", users);
   registerUserHandler(io, socket);
+
+  socket.on("disconnect", async function () {
+    console.log(`${socket.id} disconnect`);
+    const users = [];
+
+    for (let [id, socket] of io.of("/").sockets) {
+      users.push({
+        username: socket.username,
+      });
+    }
+    io.sockets.emit("users", users);
+  });
 };
+
 io.on("connection", onConnection);
 //#endregion
 

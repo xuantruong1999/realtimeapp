@@ -1,0 +1,16 @@
+Requirements:
+1. Send messsages to other people
+2. Send messages to group members
+    create group
+    add members
+    remove member
+3. Can see older messages
+4. Type messages
+5. add friends -- 
+
+
+================================================================
+design database
+
+messsage 1-n   group_member n-m  users  
+

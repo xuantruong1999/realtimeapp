@@ -3,7 +3,21 @@
 }
 
 #user-selection {
-    background-color: #9b32a8;
+    background-color: #3f0e40;
+}
+
+#user-selection li {
+    color: whitesmoke;
+}
+
+li .icon-online{
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    background-color: green;
+    margin-right: 8px;
+    display: inline-block;
+    margin-left: 10px;
 }
 
 ul#messages {
@@ -11,6 +25,13 @@ ul#messages {
     min-height: 300px;
 }
 
-form#form-chat {
+#right-block{
+    overflow: hidden;
     
+}
+
+@media(width < 576px) {
+    #right-block{
+        padding-left: 0px;
+    }
 }

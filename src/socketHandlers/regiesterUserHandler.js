@@ -1,9 +1,7 @@
 module.exports = (io, socket) => {
   const greeting = (data) => {
-    debugger;
-    socket.username = "truong";
-    socket.emit("chat:on-chat", data);
+    io.sockets.emit("chat:on-chat", { username: socket.username, data });
   };
 
-  socket.on("chat:greeting", greeting);
+  socket.on("chat:post", greeting);
 };
