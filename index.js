@@ -18,6 +18,7 @@ const { authenMiddware } = require("./src/middlewares/authentication");
 const cookieParser = require("cookie-parser");
 const registerUserHandler = require("./src/socketHandlers/regiesterUserHandler");
 const { Server } = require("socket.io");
+const helpers = require("./src/helpers/helper");
 
 const io = new Server(httpServer);
 
@@ -82,10 +83,14 @@ app.use((err, req, res, next) => {
 //#region Socket.IO integrate
 io.use((socket, next) => {
   const username = socket.handshake.auth.username;
+  const sessionId = helpers.getSession(socket.handshake.headers.cookie);
   if (!username) {
     return next(new Error("invalid username"));
   }
   socket.username = username;
+  socket.sessionId = sessionId;
+  console.log(socket);
+
   next();
 });
 

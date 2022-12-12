@@ -3,6 +3,8 @@ const { validationResult } = require("express-validator");
 const { unlink } = require("node:fs/promises");
 const ObjectId = require("mongoose").Types.ObjectId;
 const fs = require("fs");
+const { userInfo } = require("node:os");
+const { Group } = require("../models/chat.model");
 
 const index = async (req, res, next) => {
   try {
@@ -117,6 +119,15 @@ const deletePreProfileAvatar = async function (userId, filename) {
 };
 
 const chatMessage = function (req, res, next) {
-  res.render("users/chat.pug", { title: "Chat Message", res });
+  let userId = req.session.user.id;
+  if (!userId) {
+    return next(new Error("Invalid userId"));
+  }
+  Group.find({ menbers: [userId] })
+    .select({ _id: 1, name: 1 })
+    .exec(function (err, groups) {
+      if (err) return next(err);
+      res.render("users/chat.pug", { title: "Chat Message", res, groups });
+    });
 };
 module.exports = { index, update, chatMessage };

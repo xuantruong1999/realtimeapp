@@ -2,7 +2,7 @@ $(document).ready(function () {
   var username = getCookie("name");
   var socket = io({ auth: { username } });
   var buttonSubmit = document.querySelector("#btn-chatbox");
-  var userSelects = document.getElementById("user-selection");
+  var userSelects = document.getElementById("friend");
 
   $("#right-block").hide();
 
@@ -10,14 +10,14 @@ $(document).ready(function () {
     if (users.length > 0) {
       if (userSelects) {
         userSelects.replaceChildren();
-        let listLi = `<li class="user">${username} (yourself) <br>
+        let listLi = `<div class="itemSelect">${username} (yourself) <br>
           <span class="icon-online"></span>
           <span>Online</span>
-        </li>`;
+        </div>`;
 
         users.forEach((user) => {
           if (user.username !== username) {
-            listLi += `<li class="user">${user.username} <br><span class="icon-online"> </span><span>Online</span></li>`;
+            listLi += `<li class="itemSelect">${user.username} <br><span class="icon-online"> </span><span>Online</span></li>`;
           }
         });
         userSelects.innerHTML = listLi;
@@ -25,7 +25,7 @@ $(document).ready(function () {
     }
   });
 
-  $("#user-selection").on("click", "li", function (event) {
+  $("#user-selection").on("click", "li.itemSelect", function (event) {
     $("#right-block").show(400);
     event.preventDefault();
   });
@@ -46,8 +46,6 @@ $(document).ready(function () {
     var li = document.createElement("li");
     li.textContent = `${username}: ${data.message}`;
     ul.appendChild(li);
-
-    ul.scrollTop = ul.scrollHeight;
   });
 
   socket.on("connect_failed", (data) => {
