@@ -7,6 +7,8 @@
 }
 #main{
     min-height: 60vh;
+    margin: 50px 0px;
+
 }
 #footer{
     min-height: 30vh;

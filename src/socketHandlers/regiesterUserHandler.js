@@ -1,3 +1,5 @@
+const { Message, PrivateMessage } = require("../models/chat.model");
+
 module.exports = (io, socket) => {
   const greeting = (data) => {
     io.sockets.emit("chat:on-chat", { username: socket.username, data });

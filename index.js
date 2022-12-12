@@ -31,6 +31,7 @@ app.use(
   express.static(__dirname + "/node_modules/bootstrap/dist/css/")
 );
 app.use("/js", express.static(__dirname + "/node_modules/bootstrap/dist/js/"));
+app.use("/jquery", express.static(__dirname + "/node_modules/jquery/dist/"));
 
 //apply middlewares
 app.use(cors());
@@ -109,6 +110,7 @@ const onConnection = function (socket) {
         username: socket.username,
       });
     }
+
     io.sockets.emit("users", users);
   });
 };

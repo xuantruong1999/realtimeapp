@@ -1,12 +1,12 @@
-var mongoose = require('mongoose');
+var mongoose = require("mongoose");
 
 var ProfileSchema = new mongoose.Schema({
-  avatar: { type: String, default: 'profile-picture-default.jpg' },
+  avatar: { type: String, default: "profile-picture-default.jpg" },
   firstName: { type: String },
   lastName: { type: String },
   bio: {
     type: String,
-    maxlength: 200
+    maxlength: 200,
   },
   phone: {
     type: String,
@@ -14,10 +14,10 @@ var ProfileSchema = new mongoose.Schema({
       validator: function (v) {
         return /^0\d{9}/.test(v);
       },
-      message: props => `${props.value} is not a valid phone number!`
+      message: (props) => `${props.value} is not a valid phone number!`,
     },
     //required: [true, 'User phone number required']
-  }
+  },
 });
 
 //var ProfileModel = mongoose.model('Profile', ProfileSchema);
@@ -34,46 +34,52 @@ var AddressSchema = new mongoose.Schema({
   },
   zipCode: {
     type: Number,
-  }
+  },
 });
 
 //var AddressModel = mongoose.model('Address', AddressSchema);
 
-var UserSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    validate: {
-      validator: (value) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(value),
-      message: props => `${props.value} is not valid email`
+var UserSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      validate: {
+        validator: (value) =>
+          /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(value),
+        message: (props) => `${props.value} is not valid email`,
+      },
+      unique: true,
+      required: true,
+      trim: true,
     },
-    unique: true,
-    required: true,
-    trim: true
+    username: {
+      type: String,
+      unique: true,
+      required: true,
+      trim: true,
+      min: [6, "Must be at least 6"],
+    },
+    password: {
+      type: String,
+      required: true,
+      min: [6, "Must be at least 6"],
+    },
+    salt: {
+      type: String,
+      required: true,
+    },
+    remembermeToken: {
+      type: String,
+    },
+    profile: ProfileSchema,
+    address: AddressSchema,
+    groups: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "group",
+    },
   },
-  username: {
-    type: String,
-    unique: true,
-    required: true,
-    trim: true,
-    min: [6, 'Must be at least 6']
-  },
-  password: {
-    type: String,
-    required: true,
-    min: [6, 'Must be at least 6']
-  },
-  salt: {
-    type: String,
-    required: true,
-  },
-  remembermeToken: {
-    type: String,
-  },
-  profile: ProfileSchema,
-  address: AddressSchema,
-},
-  { timestamps: true },
+  { timestamps: true }
 );
 
-var UserModel = mongoose.model('User', UserSchema);
-module.exports = { UserModel };
+var UserModel = mongoose.model("User", UserSchema);
+module.exports = { UserModel, UserSchema };
