@@ -45,7 +45,6 @@ app.use(
 
 app.use(
   cookieSession({
-    //secure: true,
     keys: [process.env.SECRETKEY1],
     expires: new Date(Date.now() + 3600),
     httpOnly: true,
@@ -89,18 +88,17 @@ io.use((socket, next) => {
   }
   socket.username = username;
   socket.sessionId = sessionId;
-  console.log(socket);
 
   next();
 });
 
 const onConnection = function (socket) {
-  //console.log(socket);
   const users = [];
-
+  console.log(socket);
   for (let [id, socket] of io.of("/").sockets) {
     users.push({
       username: socket.username,
+      socketId: id,
     });
   }
   io.sockets.emit("users", users);
@@ -113,6 +111,7 @@ const onConnection = function (socket) {
     for (let [id, socket] of io.of("/").sockets) {
       users.push({
         username: socket.username,
+        socketId: id,
       });
     }
 

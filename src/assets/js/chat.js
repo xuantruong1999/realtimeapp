@@ -4,20 +4,25 @@ $(document).ready(function () {
   var buttonSubmit = document.querySelector("#btn-chatbox");
   var userSelects = document.getElementById("friend");
 
-  $("#right-block").hide();
+  //$("#right-block").hide();
 
   socket.on("users", (users) => {
     if (users.length > 0) {
       if (userSelects) {
         userSelects.replaceChildren();
-        let listLi = `<div class="itemSelect">${username} (yourself) <br>
+        let listLi = `<div class="itemSelect custome-border">${username} (yourself) <br>
           <span class="icon-online"></span>
           <span>Online</span>
         </div>`;
 
         users.forEach((user) => {
           if (user.username !== username) {
-            listLi += `<li class="itemSelect">${user.username} <br><span class="icon-online"> </span><span>Online</span></li>`;
+            listLi += `<li class="itemSelect custome-border"
+                          data-id="${user.socketId}">
+                          ${user.username} <br>
+                            <span class="icon-online"> </span>
+                            <span>Online</span>
+                          </li>`;
           }
         });
         userSelects.innerHTML = listLi;
@@ -26,7 +31,10 @@ $(document).ready(function () {
   });
 
   $("#user-selection").on("click", "li.itemSelect", function (event) {
-    $("#right-block").show(400);
+    $("#right-block").removeClass("d-none");
+    to = ""; //reset
+    let liSelected = event.currentTarget;
+    to = $(liSelected).attr("data-id");
     event.preventDefault();
   });
 
@@ -36,15 +44,15 @@ $(document).ready(function () {
     var message = inputValue.value;
 
     if (message) {
-      socket.emit("chat:post", { message });
+      socket.emit("private-message:post", { message, to: to });
       inputValue.value = "";
     }
   });
 
-  socket.on("chat:on-chat", ({ username, data }) => {
+  socket.on("private-message:response", ({ from, message }) => {
     var ul = document.querySelector("ul#messages");
     var li = document.createElement("li");
-    li.textContent = `${username}: ${data.message}`;
+    li.textContent = `${from}: ${message}`;
     ul.appendChild(li);
   });
 
