@@ -27,8 +27,23 @@ let generateRandomToken = () => {
   return crypto.randomBytes(32).toString("hex");
 };
 
-let getSession = function (cookie) {
-  let name = "session=";
+// let getSession = function (cookie) {
+//   let name = "session=";
+//   let ca = cookie.split(";");
+//   for (let i = 0; i < ca.length; i++) {
+//     let c = ca[i];
+//     while (c.charAt(0) == " ") {
+//       c = c.substring(1);
+//     }
+//     if (c.indexOf(name) == 0) {
+//       return c.substring(name.length, c.length);
+//     }
+//   }
+//   return "";
+// };
+
+const getCookie = (cname, cookie) => {
+  let name = cname + "=";
   let ca = cookie.split(";");
   for (let i = 0; i < ca.length; i++) {
     let c = ca[i];
@@ -46,5 +61,5 @@ module.exports = {
   hasher,
   generateSalt,
   generateRandomToken,
-  getSession,
+  getCookie,
 };

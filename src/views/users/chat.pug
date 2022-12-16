@@ -5,23 +5,23 @@ block layout-content
     - var groups = groups
     section#chat.row.mx-0.w-100.shadow.bg-body.rounded
         #topbar-chat.col-sm-12.p-2.d-flex.custome-border
-            div.me-auto.my-auto RealTimeChat 
+            div.me-auto.my-auto#brand RealTimeChat 
             button.btn.btn.btn-light Leave Room
         ul#user-selection.col-xs-12.col-sm-3.mb-0.h-xs-50.p-0(style="list-style: none;")
             div#list-friend
-                div.p-2.title.text-center.custome-border 
+                div.p-2.title.custome-border 
                     i.fa-solid.fa-user
                     span(style="margin-left: 5px") FRIENDS
-                div#friend
+                div#friend(aria-orientation="vertical" role="tablist")
             #groups 
-                div.p-2.title.text-center.custome-border 
+                div.p-2.title.custome-border 
                     i.fa-solid.fa-user-group 
                     span(style="margin-left: 5px") CHANNELS
                 if groups 
                     for group in groups 
                         li.itemSelect.pl-2=group.name.toString()
         #right-block.col-xs-12.col-sm-9.col-md-9.px-0.h-xs-50.d-none
-            ul#messages.border
+            ul.messages.border
             form#form-chat
                 div.form-group.d-flex.mx-auto.w-50
                     input.form-control#chatbox(type="text" style="margin-right: 10px;") 

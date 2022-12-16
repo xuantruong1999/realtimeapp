@@ -19,6 +19,7 @@ const cookieParser = require("cookie-parser");
 const registerUserHandler = require("./src/socketHandlers/regiesterUserHandler");
 const { Server } = require("socket.io");
 const helpers = require("./src/helpers/helper");
+const { UserModel } = require("./src/models/user.model");
 
 const io = new Server(httpServer);
 
@@ -82,7 +83,10 @@ app.use((err, req, res, next) => {
 //#region Socket.IO integrate
 io.use((socket, next) => {
   const username = socket.handshake.auth.username;
-  const sessionId = helpers.getSession(socket.handshake.headers.cookie);
+  const sessionId = helpers.getCookie(
+    "session",
+    socket.handshake.headers.cookie
+  );
   if (!username) {
     return next(new Error("invalid username"));
   }
@@ -92,15 +96,23 @@ io.use((socket, next) => {
   next();
 });
 
-const onConnection = function (socket) {
+const onConnection = async function (socket) {
   const users = [];
-  console.log(socket);
-  for (let [id, socket] of io.of("/").sockets) {
+  console.log("connection: ", socket.id);
+
+  for (let [socketId, socket] of io.of("/").sockets) {
+    var user = await UserModel.findOne(
+      { username: socket.username },
+      "id username"
+    ).exec();
+    console.log("user ", user);
     users.push({
-      username: socket.username,
-      socketId: id,
+      username: user.username,
+      socketId: socketId,
+      userId: user.id,
     });
   }
+
   io.sockets.emit("users", users);
   registerUserHandler(io, socket);
 
@@ -108,10 +120,16 @@ const onConnection = function (socket) {
     console.log(`${socket.id} disconnect`);
     const users = [];
 
-    for (let [id, socket] of io.of("/").sockets) {
+    for (let [socketId, socket] of io.of("/").sockets) {
+      var user = await UserModel.findOne(
+        { username: socket.username },
+        "id username"
+      ).exec();
+      console.log("user ", user);
       users.push({
-        username: socket.username,
-        socketId: id,
+        username: user.username,
+        socketId: socketId,
+        userId: user.id,
       });
     }
 

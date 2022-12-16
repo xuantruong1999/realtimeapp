@@ -25,37 +25,15 @@ const MessageSchema = new mongoose.Schema(
       required: true,
       ref: "User",
     },
-    groupId: {
+    receiverId: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "Group",
+      ref: "User",
     },
+    groupId: { type: mongoose.Schema.Types.Object, ref: "Group" },
   },
   { timestamps: true }
 );
 
 const Message = mongoose.model("message", MessageSchema);
 
-const PrivateMessageSchema = new mongoose.Schema(
-  {
-    senderId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "User",
-    },
-    receiverId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "User",
-    },
-    messageId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "Message",
-    },
-  },
-  { timestamps: true }
-);
-const PrivateMessage = mongoose.model("PrivateMessage", PrivateMessageSchema);
-
-module.exports = { Group, Message, PrivateMessage };
+module.exports = { Group, Message };
