@@ -1,9 +1,9 @@
 const { UserModel } = require("../models/user.model");
+const { Message } = require("../models/chat.model");
 const { validationResult } = require("express-validator");
 const { unlink } = require("node:fs/promises");
 const ObjectId = require("mongoose").Types.ObjectId;
 const fs = require("fs");
-const { userInfo } = require("node:os");
 const { Group } = require("../models/chat.model");
 
 const index = async (req, res, next) => {
@@ -130,4 +130,16 @@ const chatMessage = function (req, res, next) {
       res.render("users/chat.pug", { title: "Chat Message", res, groups });
     });
 };
-module.exports = { index, update, chatMessage };
+
+const loadPrivateMessages = function (req, reset, next) {
+  var isAjaxRequest = req.xhr;
+  var { senderId, recieverId } = req.body;
+  if (!isAjaxRequest || !senderId || !recieverId) {
+    return res.status(400).end();
+  }
+  Message.find({ senderId, recieverId }).exec(function (err, data) {
+    res.json(data);
+  });
+};
+
+module.exports = { index, update, chatMessage, loadPrivateMessages };

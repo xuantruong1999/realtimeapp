@@ -30,6 +30,7 @@ const MessageSchema = new mongoose.Schema(
       ref: "User",
     },
     groupId: { type: mongoose.Schema.Types.Object, ref: "Group" },
+    active: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

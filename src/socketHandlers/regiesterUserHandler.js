@@ -2,7 +2,7 @@ const { Message, PrivateMessage } = require("../models/chat.model");
 const helpers = require("../helpers/helper");
 
 module.exports = (io, socket) => {
-  const privateMessage = async ({ message, to, receiverId }) => {
+  const privateMessage = async ({ message, to }) => {
     try {
       let senderId = helpers.getCookie(
         "userId",
@@ -12,14 +12,15 @@ module.exports = (io, socket) => {
       let mess = new Message({
         text: message,
         senderId: senderId,
-        receiverId: receiverId,
+        receiverId: to.receiverId,
       });
 
       await mess.save();
 
-      socket.join(to);
-      io.to(to).emit("private-message:response", {
-        from: socket.username,
+      socket.join(to.toSocketId);
+      io.to(to.toSocketId).emit("private-message:response", {
+        from: { fromUserName: socket.username, senderId },
+        to,
         message,
       });
     } catch (err) {
