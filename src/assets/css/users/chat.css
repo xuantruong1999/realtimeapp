@@ -104,6 +104,66 @@ ul.messages {
 
 }
 
+/*start styles for the message */
+.message-container {
+    display: flex;
+    flex-direction: row;
+
+}
+
+.message-container-right {
+    display: flex;
+    flex-direction: row-reverse;
+    margin: 0 0 10px 0;
+
+}
+.message-container:not(:last-child) {
+    margin: 0 0 10px 0;
+    
+}
+
+.message-container .text-left {
+    background-color: #f6f6f6;
+    max-width: 55%;
+    border-radius: 12px;
+    padding: 15px;
+    margin-left: 10px;
+    text-justify: left;
+}
+
+.text-right {
+    background-color: #f6f6f6;
+    max-width: 55%;
+    border-radius: 12px;
+    padding: 15px;
+    margin-left: 10px;
+    text-justify: left;
+    float: right;
+}
+
+.nickname{
+    height: 50px;
+    width: 50px;
+    overflow: hidden;
+    border-radius: 50%;
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center;
+    background-color: antiquewhite;
+}
+
+.photo{
+    display: block;
+    width: 50px;
+    height: 50px;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #E6E7ED;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+/*end styles for the message */
 @media(width < 576px) {
     #right-block{
         padding-left: 0px;

@@ -38,6 +38,11 @@ $(document).ready(function () {
         tabContent.empty().append(listUl);
       }
     }
+    $("ul.tab-pane").each((index, val) => {
+      let id = $(val).attr("id");
+      let userId = id.split("-")[1] || "";
+      loadPrivateMessages(userId);
+    });
   });
 
   $("#user-selection").on("click", "li.itemSelect", function (event) {
@@ -75,12 +80,14 @@ $(document).ready(function () {
     var textContent = "";
 
     if ($(tabPanelSenderId).length > 0) {
+      //textContent = `${from.fromUserName}: ${message}`;
       textContent = `${from.fromUserName}: ${message}`;
       $(tabPanelSenderId).append(`<li>${textContent}</li>`);
     }
 
     if ($(tabPanelreceiverId).length > 0) {
-      textContent = `${from.fromUserName}: ${message}`;
+      //textContent = `${from.fromUserName}: ${message}`;
+      textContent = displayOneMessgae(message, from, to. )
       $(tabPanelreceiverId).append(`<li>${textContent}</li>`);
     }
 
@@ -102,6 +109,38 @@ $(document).ready(function () {
       }
     }
   });
+
+  // senderId {username:  text}, receiverId
+
+  function loadPrivateMessages(user1) {
+    $.ajax({
+      url: "loadPrivateMessages",
+      dataType: "json",
+      method: "POST",
+      data: {
+        user1,
+      },
+    })
+      .done(function (data) {
+        console.log(data);
+        showMessages(data);
+      })
+      .fail(function (err) {
+        console.log(err);
+      });
+  }
+
+  function showMessages({ rows, receiverId }) {
+    let id = `#tab-${receiverId}`;
+    let ul = $(id);
+
+    if (rows.length > 0 && $(ul).length > 0) {
+      rows.forEach(({ text, fromUser, toUser }) => {
+        let html = displayOneMessgae(text, fromUser, receiverId);
+        $(ul).append(html);
+      });
+    }
+  }
 
   socket.on("connect_failed", (data) => {
     document.write("Sorry, there seems to be an issue with the connection!");

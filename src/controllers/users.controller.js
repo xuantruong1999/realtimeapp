@@ -5,7 +5,7 @@ const { unlink } = require("node:fs/promises");
 const ObjectId = require("mongoose").Types.ObjectId;
 const fs = require("fs");
 const { Group } = require("../models/chat.model");
-
+const { MessageViewModel } = require("../viewmodels/user.view.model");
 const index = async (req, res, next) => {
   try {
     let userId;
@@ -131,15 +131,50 @@ const chatMessage = function (req, res, next) {
     });
 };
 
-const loadPrivateMessages = function (req, reset, next) {
+const loadPrivateMessages = async function (req, res, next) {
+  console.log("starting to load private messages");
   var isAjaxRequest = req.xhr;
-  var { senderId, recieverId } = req.body;
-  if (!isAjaxRequest || !senderId || !recieverId) {
+  var { user1 } = req.body;
+  var user2 = req.session.user.id;
+  if (!isAjaxRequest || !user1 || !user2) {
     return res.status(400).end();
   }
-  Message.find({ senderId, recieverId }).exec(function (err, data) {
-    res.json(data);
-  });
+
+  let result = { rows: [], receiverId: user1 };
+
+  var list = await Message.find(
+    { user1, user2, active: true },
+    "id receiverId senderId text"
+  )
+    .sort({ createdAt: 1 })
+    .exec();
+
+  const handleListMessage = async function (messages) {
+    let result = { rows: [], receiverId: user1 };
+    for (const message of messages) {
+      console.log("start looping...");
+
+      let fromUser = await UserModel.findById(
+        message.senderId,
+        "username profile.avatar"
+      ).exec();
+
+      let toUser = await UserModel.findById(
+        message.receiverId,
+        "username"
+      ).exec();
+
+      result.rows.push(new MessageViewModel(message.text, fromUser, toUser));
+      console.log("end looping...");
+    }
+    return result;
+  };
+
+  result = await handleListMessage(list);
+  console.log(result);
+  res.json(result);
+
+  console.log("end loadPrivateMessages");
 };
 
 module.exports = { index, update, chatMessage, loadPrivateMessages };

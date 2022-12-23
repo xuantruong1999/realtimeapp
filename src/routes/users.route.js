@@ -16,6 +16,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 router.get("/", usersController.index);
 router.get("/messages", usersController.chatMessage);
+router.post("/loadPrivateMessages", usersController.loadPrivateMessages);
 router.post(
   "/update",
   upload.single("avatar"),
