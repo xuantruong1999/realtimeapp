@@ -20,6 +20,7 @@ const registerUserHandler = require("./src/socketHandlers/regiesterUserHandler")
 const { Server } = require("socket.io");
 const helpers = require("./src/helpers/helper");
 const { UserModel } = require("./src/models/user.model");
+const numCPUs = require("os").cpus().length;
 
 const io = new Server(httpServer);
 
@@ -103,13 +104,14 @@ const onConnection = async function (socket) {
   for (let [socketId, socket] of io.of("/").sockets) {
     var user = await UserModel.findOne(
       { username: socket.username },
-      "id username"
+      "id username profile.avatar"
     ).exec();
-    console.log("user ", user);
+    //console.log("user ", user);
     users.push({
       username: user.username,
       socketId: socketId,
       userId: user.id,
+      avatar: user.profile.avatar ?? "",
     });
   }
 
@@ -123,18 +125,21 @@ const onConnection = async function (socket) {
     for (let [socketId, socket] of io.of("/").sockets) {
       var user = await UserModel.findOne(
         { username: socket.username },
-        "id username"
+        "id username profile.avatar"
       ).exec();
-      console.log("user ", user);
+      //console.log("user ", user);
       users.push({
         username: user.username,
         socketId: socketId,
         userId: user.id,
+        avatar: user.profile.avatar ?? "",
       });
     }
 
     io.sockets.emit("users", users);
   });
+
+  console.log("Rooms: ", io.sockets.adapter.rooms);
 };
 
 io.on("connection", onConnection);
@@ -152,8 +157,9 @@ mongoose
   .catch((err) =>
     console.log(`Can not connect to mongodb server with error: ${err}`)
   );
-var port = process.env.PORT;
-
+var port = process.env.PORT || 3000;
+// Check the number of available CPU.
 httpServer.listen(port, () => {
+  console.log("number of available CPU: ", numCPUs);
   console.log(`RealTime App listening on port ${port}`);
 });

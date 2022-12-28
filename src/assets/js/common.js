@@ -37,7 +37,6 @@ function displayOneMessgae(text, fromUser, receiverId) {
       <div class="nickname"  data-bs-toggle="tooltip" data-bs-placement="top" title="${
         fromUser.username
       }">${reduceNickNameString(fromUser.username)}
-       
         </div> 
       <div class="text-left d-inline-block">${text}</div>
     </li>`;

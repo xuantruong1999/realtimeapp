@@ -6,6 +6,7 @@ const ObjectId = require("mongoose").Types.ObjectId;
 const fs = require("fs");
 const { Group } = require("../models/chat.model");
 const { MessageViewModel } = require("../viewmodels/user.view.model");
+
 const index = async (req, res, next) => {
   try {
     let userId;
@@ -99,7 +100,7 @@ const deletePreProfileAvatar = async function (userId, filename) {
     return;
   }
 
-  await UserModel.findById(userId).exec(function (err, user) {
+  UserModel.findById(userId).exec(function (err, user) {
     if (err) return next(err);
     try {
       let profile = user.profile;
@@ -132,18 +133,22 @@ const chatMessage = function (req, res, next) {
 };
 
 const loadPrivateMessages = async function (req, res, next) {
-  console.log("starting to load private messages");
   var isAjaxRequest = req.xhr;
   var { user1 } = req.body;
   var user2 = req.session.user.id;
+  console.log(`load messaege: username body: ${req.body.username}`);
+
   if (!isAjaxRequest || !user1 || !user2) {
     return res.status(400).end();
   }
-
   let result = { rows: [], receiverId: user1 };
 
   var list = await Message.find(
-    { user1, user2, active: true },
+    {
+      senderId: { $in: [ObjectId(user1), ObjectId(user2)] },
+      receiverId: { $in: [ObjectId(user1), ObjectId(user2)] },
+      active: true,
+    },
     "id receiverId senderId text"
   )
     .sort({ createdAt: 1 })
@@ -152,7 +157,7 @@ const loadPrivateMessages = async function (req, res, next) {
   const handleListMessage = async function (messages) {
     let result = { rows: [], receiverId: user1 };
     for (const message of messages) {
-      console.log("start looping...");
+      //console.log("start looping...");
 
       let fromUser = await UserModel.findById(
         message.senderId,
@@ -165,16 +170,19 @@ const loadPrivateMessages = async function (req, res, next) {
       ).exec();
 
       result.rows.push(new MessageViewModel(message.text, fromUser, toUser));
-      console.log("end looping...");
+      //console.log("end looping...");
     }
+    console.log(
+      `load messaege: user1: ${user1}--user2: ${user2} total messages: `,
+      result.rows.length
+    );
     return result;
   };
 
   result = await handleListMessage(list);
-  console.log(result);
   res.json(result);
 
-  console.log("end loadPrivateMessages");
+  //console.log("end loadPrivateMessages");
 };
 
 module.exports = { index, update, chatMessage, loadPrivateMessages };

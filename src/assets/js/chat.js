@@ -5,6 +5,7 @@ $(document).ready(function () {
   var userSelects = document.getElementById("friend");
   var tabContent = $("#right-block .tab-content");
   var to = { toSocketId: "", toUserName: "", receiverId: "" };
+
   socket.on("users", (users) => {
     if (users.length > 0) {
       if (userSelects) {
@@ -17,7 +18,7 @@ $(document).ready(function () {
         users.forEach((user, index) => {
           if (user.username !== username) {
             listLi += `<li class="itemSelect custome-border"
-                          data-id="${user.socketId}" data-username="${user.username}" receiverId="${user.userId}">
+                          data-id="${user.socketId}" data-avatar="${user.avatar}" data-username="${user.username}" receiverId="${user.userId}">
                           <button class="d-block"
                             data-bs-target="#tab-${user.userId}" 
                             data-bs-toggle="tab" 
@@ -36,18 +37,35 @@ $(document).ready(function () {
         });
         userSelects.innerHTML = listLi;
         tabContent.empty().append(listUl);
+
+        if (to.receiverId) {
+          //clear active show tab pane if one user disconnected
+          $("ul.tab-pane active show").each((index, value) => {
+            if ($(value).hasClass("active show")) {
+              $(value).removeClass("active show");
+            }
+          });
+
+          let ulActive = $(`ul#tab-${to.receiverId}`);
+          if ($(ulActive).length > 0) $(ulActive).toggleClass('active show"');
+        }
       }
     }
+
     $("ul.tab-pane").each((index, val) => {
       let id = $(val).attr("id");
       let userId = id.split("-")[1] || "";
-      loadPrivateMessages(userId);
+      console.log(
+        `from: ${username}  | userid passed to loadPrivateMessages ===> ${userId} `
+      );
+      if (userId) loadPrivateMessages(userId);
+      else {
+        console.log("userId passing loadPrivateMessages is invalid");
+      }
     });
   });
 
   $("#user-selection").on("click", "li.itemSelect", function (event) {
-    event.preventDefault();
-
     $("#right-block").removeClass("d-none");
     to = { toSocketId: "", toUserName: "", receiverId: "" }; //reset
     let liSelected = event.currentTarget;
@@ -62,6 +80,8 @@ $(document).ready(function () {
       $(badge).addClass("d-none");
       $(badge).text(0);
     }
+
+    event.preventDefault();
   });
 
   buttonSubmit.addEventListener("click", function (event) {
@@ -75,42 +95,57 @@ $(document).ready(function () {
   });
 
   socket.on("private-message:response", ({ from, message, to }) => {
-    var tabPanelSenderId = $(`#tab-${to.receiverId}`);
-    var tabPanelreceiverId = $(`#tab-${from.senderId}`);
-    var textContent = "";
-
-    if ($(tabPanelSenderId).length > 0) {
-      //textContent = `${from.fromUserName}: ${message}`;
-      textContent = `${from.fromUserName}: ${message}`;
-      $(tabPanelSenderId).append(`<li>${textContent}</li>`);
-    }
+    var tabPanelreceiverId = $(`#tab-${to.receiverId}`);
+    var tabPanelsenderId = $(`#tab-${from.senderId}`);
 
     if ($(tabPanelreceiverId).length > 0) {
-      //textContent = `${from.fromUserName}: ${message}`;
-      textContent = displayOneMessgae(message, from, to. )
-      $(tabPanelreceiverId).append(`<li>${textContent}</li>`);
+      let html = `<li class="message-container-right">
+                    <div class="text-right d-inline-block">${message}</div>
+                  </li>`;
+      $(tabPanelreceiverId).append(html);
     }
 
-    if (from.fromUserName !== username) {
-      let id = `#tab-${from.senderId}`;
-      let checkActive = $(id)?.hasClass("active");
-      if (!checkActive) {
-        let badge = $("li[data-username=" + from.fromUserName + "]").children(
-          ".badge"
-        );
-        if (badge.length > 0) {
-          let numMess = $(badge).text();
-          numMess = Number.parseInt(numMess) || 0;
-          numMess++;
-          if (numMess !== 0) {
-            $(badge).text(numMess).removeClass("d-none");
+    if ($(tabPanelsenderId).length > 0) {
+      var avatar = $(`li[receiverId="${from.senderId}"]`)?.attr("data-avatar");
+      if (avatar !== "profile-picture-default.jpg") {
+        html = `<li class="message-container">
+        <div class="photo" style="background-image: url(/images/${avatar});"
+         data-bs-toggle="tooltip" data-bs-placement="top" title="${from.fromUserName}">
+         
+          </div> 
+        <div class="text-left d-inline-block">${message}</div>
+      </li>`;
+      } else {
+        html = `<li class="message-container">
+        <div class="nickname"  data-bs-toggle="tooltip" data-bs-placement="top" title="${
+          from.fromUserName
+        }">${reduceNickNameString(from.fromUserName)}
+          </div> 
+        <div class="text-left d-inline-block">${message}</div>
+      </li>`;
+      }
+      $(tabPanelsenderId).append(html);
+
+      if (from.fromUserName !== username) {
+        let id = `#tab-${from.senderId}`;
+        let checkActive = $(id)?.hasClass("active");
+        if (!checkActive) {
+          //turn on badge notification
+          let badge = $("li[data-username=" + from.fromUserName + "]").children(
+            ".badge"
+          );
+          if (badge.length > 0) {
+            let numMess = $(badge).text();
+            numMess = Number.parseInt(numMess) || 0;
+            numMess++;
+            if (numMess !== 0) {
+              $(badge).text(numMess).removeClass("d-none");
+            }
           }
         }
       }
     }
   });
-
-  // senderId {username:  text}, receiverId
 
   function loadPrivateMessages(user1) {
     $.ajax({
@@ -119,6 +154,7 @@ $(document).ready(function () {
       method: "POST",
       data: {
         user1,
+        username: username,
       },
     })
       .done(function (data) {
