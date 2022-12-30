@@ -22,13 +22,6 @@ module.exports = (io, socket) => {
           socket.leave(id);
         });
 
-      // Array.from(socket.rooms)
-      // .filter(it => it !== socket.id)
-      // .forEach(id => {
-      //   socket.leave(id);
-      //   socket.removeAllListeners(`emitMessage`);
-      // });
-
       var arr = [socket.username, to.toUserName];
       arr = arr.sort((a, b) => (a < b ? -1 : 1));
 
