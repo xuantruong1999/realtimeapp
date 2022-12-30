@@ -8,13 +8,10 @@ const authenMiddware = async (req, res, next) => {
   }
 
   if (req.cookies["remembermeToken"] && req.cookies["userId"]) {
-    let user = await UserModel.findOne(
-      {
-        _id: req.cookies["userId"],
-        remembermeToken: req.cookies["remembermeToken"],
-      },
-      "id"
-    ).exec();
+    let user = await UserModel.findOne({
+      _id: req.cookies["userId"],
+      remembermeToken: req.cookies["remembermeToken"],
+    }).exec();
 
     if (user) {
       req.session.user = { isAuth: true, id: user.id };

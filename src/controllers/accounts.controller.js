@@ -62,7 +62,10 @@ const authen = async (req, res) => {
         //expired a week
 
         res.cookie("remembermeToken", userUpdated.remembermeToken, options);
-        res.cookie("name", user.username, options);
+        res.cookie("name", user.username, {
+          expires: new Date(Date.now() + 24 * 7 * 3600000),
+          httpOnly: false,
+        });
 
         return res.render("home/index.pug", { username: user.username });
       } else {

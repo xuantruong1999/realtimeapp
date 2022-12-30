@@ -1,5 +1,5 @@
 $(document).ready(function () {
-  var username = getCookie("name");
+  var username = getCookie("name") || "";
   var socket = io({ auth: { username } });
   var buttonSubmit = document.querySelector("#btn-chatbox");
   var userSelects = document.getElementById("friend");
@@ -7,6 +7,7 @@ $(document).ready(function () {
   var to = { toSocketId: "", toUserName: "", receiverId: "" };
 
   socket.on("users", (users) => {
+    console.log("list user connecting: ", users);
     if (users.length > 0) {
       if (userSelects) {
         userSelects.replaceChildren();
@@ -36,15 +37,13 @@ $(document).ready(function () {
           }
         });
         userSelects.innerHTML = listLi;
-        tabContent.empty().append(listUl);
+        let loading = `<div class="preloader"><div class="spinner-border" style="width: 2rem; height: 2rem;" role="status">
+      </div></div>`;
+        tabContent.empty().append(loading).append(listUl);
 
         if (to.receiverId) {
           //clear active show tab pane if one user disconnected
-          $("ul.tab-pane active show").each((index, value) => {
-            if ($(value).hasClass("active show")) {
-              $(value).removeClass("active show");
-            }
-          });
+          clearTabpane();
 
           let ulActive = $(`ul#tab-${to.receiverId}`);
           if ($(ulActive).length > 0) $(ulActive).toggleClass('active show"');
@@ -89,21 +88,23 @@ $(document).ready(function () {
     var inputValue = document.querySelector("input#chatbox");
     var message = inputValue.value;
     if (message && to && to.toSocketId && to.toUserName && to.receiverId) {
+      var tabPanelreceiverId = $(`#tab-${to.receiverId}`);
+
+      if ($(tabPanelreceiverId).length > 0) {
+        let html = `<li class="message-container-right">
+                      <div class="text-right d-inline-block">${message}</div>
+                    </li>`;
+        $(tabPanelreceiverId).append(html);
+      }
+
       socket.emit("private-message:post", { message, to: to });
       inputValue.value = "";
     }
   });
 
   socket.on("private-message:response", ({ from, message, to }) => {
-    var tabPanelreceiverId = $(`#tab-${to.receiverId}`);
+    clearTabpane();
     var tabPanelsenderId = $(`#tab-${from.senderId}`);
-
-    if ($(tabPanelreceiverId).length > 0) {
-      let html = `<li class="message-container-right">
-                    <div class="text-right d-inline-block">${message}</div>
-                  </li>`;
-      $(tabPanelreceiverId).append(html);
-    }
 
     if ($(tabPanelsenderId).length > 0) {
       var avatar = $(`li[receiverId="${from.senderId}"]`)?.attr("data-avatar");
@@ -126,7 +127,7 @@ $(document).ready(function () {
       }
       $(tabPanelsenderId).append(html);
 
-      if (from.fromUserName !== username) {
+      if (from.senderId) {
         let id = `#tab-${from.senderId}`;
         let checkActive = $(id)?.hasClass("active");
         if (!checkActive) {
@@ -152,9 +153,13 @@ $(document).ready(function () {
       url: "loadPrivateMessages",
       dataType: "json",
       method: "POST",
+      timeout: 5000,
       data: {
         user1,
         username: username,
+      },
+      beforeSend: function () {
+        showLoading();
       },
     })
       .done(function (data) {
@@ -163,6 +168,9 @@ $(document).ready(function () {
       })
       .fail(function (err) {
         console.log(err);
+      })
+      .always(function () {
+        hideLoading();
       });
   }
 
@@ -178,7 +186,24 @@ $(document).ready(function () {
     }
   }
 
-  socket.on("connect_failed", (data) => {
-    document.write("Sorry, there seems to be an issue with the connection!");
+  function showLoading() {
+    $(".preloader").show();
+  }
+
+  function hideLoading() {
+    $(".preloader").hide();
+  }
+
+  function clearTabpane() {
+    $("ul.tab-pane active show").each((index, value) => {
+      $(value).removeClass("active show");
+    });
+  }
+
+  socket.on("connect_error", (err) => {
+    document.write(
+      "Sorry, there seems to be an issue with the connection! with error: ",
+      err.message
+    );
   });
 });

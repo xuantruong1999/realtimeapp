@@ -20,8 +20,6 @@ const registerUserHandler = require("./src/socketHandlers/regiesterUserHandler")
 const { Server } = require("socket.io");
 const helpers = require("./src/helpers/helper");
 const { UserModel } = require("./src/models/user.model");
-const numCPUs = require("os").cpus().length;
-
 const io = new Server(httpServer);
 
 //setting view mapping with the template engine pug
@@ -160,6 +158,6 @@ mongoose
 var port = process.env.PORT || 3000;
 // Check the number of available CPU.
 httpServer.listen(port, () => {
-  console.log("number of available CPU: ", numCPUs);
+  //console.log("number of available CPU: ", numCPUs);
   console.log(`RealTime App listening on port ${port}`);
 });

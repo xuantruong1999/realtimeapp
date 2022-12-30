@@ -124,10 +124,11 @@ const chatMessage = function (req, res, next) {
   if (!userId) {
     return next(new Error("Invalid userId"));
   }
-  Group.find({ menbers: [userId] })
+  Group.find({ members: { $in: [ObjectId(userId)] } })
     .select({ _id: 1, name: 1 })
     .exec(function (err, groups) {
       if (err) return next(err);
+      console.log("group: ", groups);
       res.render("users/chat.pug", { title: "Chat Message", res, groups });
     });
 };
