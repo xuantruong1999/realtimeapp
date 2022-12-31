@@ -102,8 +102,13 @@ $(document).ready(function () {
     }
   });
 
-  socket.on("private-message:response", ({ from, message, to }) => {
-    clearTabpane();
+  socket.on("private-message:response", ({ from, message }) => {
+    if (to.receiverId) {
+      clearTabpane();
+      let ulActive = $(`ul#tab-${to.receiverId}`);
+      if ($(ulActive).length > 0) $(ulActive).toggleClass('active show"');
+    }
+
     var tabPanelsenderId = $(`#tab-${from.senderId}`);
 
     if ($(tabPanelsenderId).length > 0) {
@@ -195,8 +200,10 @@ $(document).ready(function () {
   }
 
   function clearTabpane() {
-    $("ul.tab-pane active show").each((index, value) => {
-      $(value).removeClass("active show");
+    $("ul.tab-pane").each((index, value) => {
+      if ($(value).hasClass("active show")) {
+        $(value).removeClass("active show");
+      }
     });
   }
 
