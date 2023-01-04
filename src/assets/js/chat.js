@@ -1,14 +1,15 @@
 $(document).ready(function () {
   var username = getCookie("name") || "";
   var socket = io({ auth: { username } });
-  var buttonSubmit = document.querySelector("#btn-chatbox");
+  var buttonSubmit = document.querySelector("#btn-chatbox-1");
   var userSelects = document.getElementById("friend");
-  var tabContent = $("#right-block .tab-content");
+  var tabContent = $("#right-block-1 #private-messages-box");
   var to = { toSocketId: "", toUserName: "", receiverId: "" };
+  var groupId = "";
 
   socket.on("users", (users) => {
     console.log("list user connecting: ", users);
-    if (users.length > 0) {
+    if (users.length >= 1) {
       if (userSelects) {
         userSelects.replaceChildren();
         let listLi = `<div class="itemSelect custome-border">${username} (yourself) <br>
@@ -16,6 +17,7 @@ $(document).ready(function () {
           <span>Online</span>
         </div>`;
         let listUl = "";
+        //generate list friend user vs tab content combine,showing private messages
         users.forEach((user, index) => {
           if (user.username !== username) {
             listLi += `<li class="itemSelect custome-border"
@@ -32,46 +34,61 @@ $(document).ready(function () {
                             <span class="badge d-none">0</span>
                         </li>`;
 
-            listUl += `<ul class="tab-pane p-2" role="tabpanel" 
+            if (to.receiverId !== user.userId) {
+              listUl += `<ul class="tab-pane p-2" role="tabpanel" 
                     id="tab-${user.userId}"></ul>`;
+            } else {
+              listUl += `<ul class="tab-pane p-2 active show" role="tabpanel" 
+              id="tab-${user.userId}"></ul>`;
+            }
           }
         });
         userSelects.innerHTML = listLi;
-        let loading = `<div class="preloader"><div class="spinner-border" style="width: 2rem; height: 2rem;" role="status">
-      </div></div>`;
-        tabContent.empty().append(loading).append(listUl);
 
-        if (to.receiverId) {
-          //clear active show tab pane if one user disconnected
-          clearTabpane();
-
-          let ulActive = $(`ul#tab-${to.receiverId}`);
-          if ($(ulActive).length > 0) $(ulActive).toggleClass('active show"');
+        let loading = "";
+        if (users.length > 1) {
+          loading = `<div class="preloader"><div class="spinner-border" style="width: 2rem; height: 2rem;" role="status">
+                    </div></div>`;
         }
+
+        tabContent.empty().append(loading).append(listUl);
       }
     }
 
     $("ul.tab-pane").each((index, val) => {
       let id = $(val).attr("id");
       let userId = id.split("-")[1] || "";
-      console.log(
-        `from: ${username}  | userid passed to loadPrivateMessages ===> ${userId} `
-      );
-      if (userId) loadPrivateMessages(userId);
-      else {
+      if (userId) {
+        loadPrivateMessages(userId);
+      } else {
         console.log("userId passing loadPrivateMessages is invalid");
+        throw new Error("userid is invalid");
       }
     });
   });
 
+  socket.on("private-message:disconnect", ({ socketId }) => {
+    console.log("Disconect socket id ========> ", socketId);
+    setOffLine(socketId);
+  });
+
   $("#user-selection").on("click", "li.itemSelect", function (event) {
-    $("#right-block").removeClass("d-none");
-    to = { toSocketId: "", toUserName: "", receiverId: "" }; //reset
     let liSelected = event.currentTarget;
-    to.toSocketId = $(liSelected).attr("data-id");
-    to.receiverId = $(liSelected).attr("receiverId");
-    to.toUserName = $(liSelected).attr("data-username");
-    if (to.toUserName) $("#brand").text(to.toUserName.toLocaleUpperCase());
+    groupId = $(liSelected).attr("data-group-id");
+    if (groupId) {
+      $("#right-block-2").removeClass("d-none");
+      $("#right-block-1").addClass("d-none");
+      let brand = $(liSelected).children("button").first()?.text();
+      $("#brand").text(brand?.toLocaleUpperCase());
+    } else {
+      $("#right-block-1").removeClass("d-none");
+      $("#right-block-2").addClass("d-none");
+      to = { toSocketId: "", toUserName: "", receiverId: "" }; //reset
+      to.toSocketId = $(liSelected).attr("data-id");
+      to.receiverId = $(liSelected).attr("receiverId");
+      to.toUserName = $(liSelected).attr("data-username");
+      if (to.toUserName) $("#brand").text(to.toUserName.toLocaleUpperCase());
+    }
 
     //remove badge noti
     let badge = $(liSelected).children(".badge");
@@ -84,8 +101,7 @@ $(document).ready(function () {
   });
 
   buttonSubmit.addEventListener("click", function (event) {
-    event.preventDefault();
-    var inputValue = document.querySelector("input#chatbox");
+    var inputValue = document.querySelector("input#chatbox-1");
     var message = inputValue.value;
     if (message && to && to.toSocketId && to.toUserName && to.receiverId) {
       var tabPanelreceiverId = $(`#tab-${to.receiverId}`);
@@ -99,6 +115,58 @@ $(document).ready(function () {
 
       socket.emit("private-message:post", { message, to: to });
       inputValue.value = "";
+    } else {
+      //handle for chat group
+    }
+
+    event.preventDefault();
+  });
+
+  $("#btn-chatbox-2").click(function (event) {
+    let value = $("input#chatbox-2").val();
+    if (value) {
+      socket.emit("room-message:post", { message: value, groupId: groupId });
+    }
+    $("input#chatbox-2").val("");
+    event.preventDefault();
+  });
+
+  socket.on("room-message:response", function ({ message, groupId, from }) {
+    console.log("message: =================> ", message);
+    console.log("groupId: =================> ", groupId);
+    console.log("from: =================> ", from);
+    let ul = $(`#tab-${groupId}`);
+    if ($(ul).length > 0) {
+      var { fromUserName, senderId, avatar } = from;
+      let html = "";
+
+      if (fromUserName === username) {
+        html = `<li class="message-container-right">
+                  <div class="text-right d-inline-block">${message}</div>
+                </li>`;
+        $(ul).append(html);
+        return;
+      }
+
+      if (avatar !== "profile-picture-default.jpg") {
+        html = `<li class="message-container">
+        <div class="photo" style="background-image: url(/images/${avatar});"
+         data-bs-toggle="tooltip" data-bs-placement="top" title="${username}">
+         
+          </div> 
+        <div class="text-left d-inline-block">${message}</div>
+      </li>`;
+      } else {
+        html = `<li class="message-container">
+        <div class="nickname"  data-bs-toggle="tooltip" data-bs-placement="top" title="${fromUserName}">${reduceNickNameString(
+          fromUserName
+        )}
+          </div> 
+        <div class="text-left d-inline-block">${message}</div>
+      </li>`;
+      }
+
+      $(ul).append(html);
     }
   });
 
@@ -207,7 +275,23 @@ $(document).ready(function () {
     });
   }
 
+  function setOffLine(socketId) {
+    let button = $(`li[data-id="${socketId}"]`).children("button");
+    if ($(button).length > 0) {
+      var tagSpans = $(button).children("span");
+      $(tagSpans).first().css("background-color", "orange");
+      $(tagSpans).last().text("Offline");
+    }
+  }
+
   socket.on("connect_error", (err) => {
+    document.write(
+      "Sorry, there seems to be an issue with the connection! with error: ",
+      err.message
+    );
+  });
+
+  socket.on("error", (err) => {
     document.write(
       "Sorry, there seems to be an issue with the connection! with error: ",
       err.message

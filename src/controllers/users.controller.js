@@ -124,7 +124,10 @@ const chatMessage = function (req, res, next) {
   if (!userId) {
     return next(new Error("Invalid userId"));
   }
-  Group.find({ members: { $in: [ObjectId(userId)] } })
+
+  Group.find({
+    $or: [{ members: { $in: [ObjectId(userId)] } }, { members: [] }],
+  })
     .select({ _id: 1, name: 1 })
     .exec(function (err, groups) {
       if (err) return next(err);
@@ -171,7 +174,6 @@ const loadPrivateMessages = async function (req, res, next) {
       ).exec();
 
       result.rows.push(new MessageViewModel(message.text, fromUser, toUser));
-      //console.log("end looping...");
     }
     console.log(
       `load messaege: user1: ${user1}--user2: ${user2} total messages: `,
@@ -182,8 +184,6 @@ const loadPrivateMessages = async function (req, res, next) {
 
   result = await handleListMessage(list);
   res.json(result);
-
-  //console.log("end loadPrivateMessages");
 };
 
 module.exports = { index, update, chatMessage, loadPrivateMessages };

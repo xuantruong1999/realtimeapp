@@ -104,7 +104,6 @@ const onConnection = async function (socket) {
       { username: socket.username },
       "id username profile.avatar"
     ).exec();
-    //console.log("user ", user);
     users.push({
       username: user.username,
       socketId: socketId,
@@ -134,7 +133,9 @@ const onConnection = async function (socket) {
       });
     }
 
-    io.sockets.emit("users", users);
+    socket.broadcast.emit("private-message:disconnect", {
+      socketId: socket.id,
+    });
   });
 
   console.log("Rooms: ", io.sockets.adapter.rooms);

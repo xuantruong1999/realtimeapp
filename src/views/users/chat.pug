@@ -17,15 +17,26 @@ block layout-content
                 div.p-2.title.custome-border 
                     i.fa-solid.fa-user-group 
                     span(style="margin-left: 5px") CHANNELS
-                if groups 
-                    for group in groups 
-                        li.itemSelect.pl-2=group.name.toString()
-        #right-block.col-xs-12.col-sm-9.col-md-9.px-0.h-xs-50.d-none
-            div.tab-content.border
-            form#form-chat
+                ul.p-0(role="tablist")
+                    if groups 
+                        for group in groups 
+                            li.itemSelect.pl-2.py-2.w-100(data-group-id=`${group.id}`)
+                                button.d-block(data-bs-target=`#tab-${group.id}` data-bs-toggle="tab" type="button" aria-selected="false" role="tab" aria-controls=`tab-${group.id}`)=group.name.toString()
+        #right-block-1.col-xs-12.col-sm-9.col-md-9.px-0.h-xs-50.d-none
+            div#private-messages-box.tab-content.border
+            form.form-chat
                 div.form-group.d-flex.mx-auto.w-50.mt-3
-                    input.form-control#chatbox(type="text" style="margin-right: 10px;") 
-                    button#btn-chatbox.btn.btn-primary(type="submit") Send 
+                    input.form-control#chatbox-1(type="text" style="margin-right: 10px;") 
+                    button#btn-chatbox-1.btn.btn-primary(type="submit") Send 
+        #right-block-2.col-xs-12.col-sm-9.col-md-9.px-0.h-xs-50.d-none
+            div#room-messages-box.tab-content.border
+                if groups 
+                    for group in groups
+                        ul.tab-pane.p-2(id=`tab-${group.id}` role="tabpanel")
+            form.form-chat
+                div.form-group.d-flex.mx-auto.w-50.mt-3
+                    input.form-control#chatbox-2(type="text" style="margin-right: 10px;") 
+                    button#btn-chatbox-2.btn.btn-primary(type="submit") Send
     script(src="/socket.io/socket.io.js" type="text/javascript")
     script(src="/assets/js/chat.js")
 

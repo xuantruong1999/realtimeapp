@@ -77,11 +77,17 @@ ul#friend{
 
 }
 
-#right-block{
-    height: 90%;    
+#right-block-1{
+    height: 90%;  
+
 }
 
- span.icon-online{
+#right-block-2{
+    height: 90%;  
+
+}
+
+span.icon-online{
     height: 8px;
     width: 8px;
     border-radius: 50%;
@@ -90,6 +96,7 @@ ul#friend{
     display: inline-block;
     margin-left: 10px;
 }
+
 div.tab-content {
     height:85%;
     overflow-y: scroll; 
@@ -99,7 +106,7 @@ ul.messages {
     list-style: none;
 }
 
-#form-chat{
+.form-chat{
     height: 15%;
 
 }
@@ -117,6 +124,7 @@ ul.messages {
     margin: 0 0 10px 0;
 
 }
+
 .message-container:not(:last-child) {
     margin: 0 0 10px 0;
     
@@ -173,7 +181,10 @@ ul.messages {
 }
 /*end styles for the message */
 @media(width < 576px) {
-    #right-block{
+    #right-block-1{
+        padding-left: 0px;
+    }
+    #right-block-2{
         padding-left: 0px;
     }
 }
