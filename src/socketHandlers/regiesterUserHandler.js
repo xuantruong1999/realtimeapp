@@ -25,7 +25,7 @@ module.exports = (io, socket) => {
       console.log(`rooms: `, socket.rooms);
       io.to(to.toSocketId).emit("private-message:response", {
         // same with io.sockets.to(to.toSocketId)
-        // same with  sockets.emit
+
         from: { fromUserName: socket.username, senderId },
         to,
         message,
@@ -43,7 +43,7 @@ module.exports = (io, socket) => {
       "id username profile.avatar"
     ).exec();
 
-    Group.findById(groupId).exec(function (err, group) {
+    Group.findById(groupId).exec(async function (err, group) {
       if (err) return next(err);
       if (!group) {
         return socket.emit("error", { message: "group id is not exist" });
@@ -54,7 +54,10 @@ module.exports = (io, socket) => {
         senderId: user.id,
         avatar: user.profile.avatar,
       };
-      return socket.emit("room-message:response", {
+
+      await saveMessage(message, user.id, "", groupId);
+
+      return io.to(groupId).emit("room-message:response", {
         message,
         groupId,
         from,
@@ -62,15 +65,32 @@ module.exports = (io, socket) => {
     });
   };
 
+  const joinGroup = async function (groupId) {
+    socket.join(groupId);
+    socket.to(groupId).emit("room-message:notification-join", {
+      newUser: socket.username,
+    });
+  };
+
   socket.on("private-message:post", privateMessage);
   socket.on("room-message:post", roomMessage);
+  socket.on("join", joinGroup);
 };
 
-const saveMessage = async function (message, senderId, receiverId) {
-  let mess = new Message({
-    text: message,
-    senderId: senderId,
-    receiverId: receiverId,
-  });
+const saveMessage = async function (message, senderId, receiverId, groupId) {
+  let mess;
+  if (receiverId) {
+    mess = new Message({
+      text: message,
+      senderId: senderId,
+      receiverId: receiverId,
+    });
+  } else if (groupId) {
+    mess = new Message({
+      text: message,
+      senderId: senderId,
+      groupId: groupId,
+    });
+  }
   await mess.save();
 };

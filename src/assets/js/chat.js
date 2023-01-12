@@ -1,4 +1,5 @@
 $(document).ready(function () {
+  //Global variables
   var username = getCookie("name") || "";
   var socket = io({ auth: { username } });
   var buttonSubmit = document.querySelector("#btn-chatbox-1");
@@ -100,6 +101,24 @@ $(document).ready(function () {
     event.preventDefault();
   });
 
+  //join group
+  if ($("#groups li.itemSelect").length > 0) {
+    $("#groups li.itemSelect")
+      .first()
+      .one("click", function () {
+        console.log("this: ", this);
+        let id = $(this).attr("data-group-id");
+
+        if (id) {
+          socket.emit("join", id);
+          let generalRoom = $(`ul#tab-${id}`);
+          if ($(generalRoom).length > 0) {
+            loadRoomMesssages(id);
+          }
+        }
+      });
+  }
+
   buttonSubmit.addEventListener("click", function (event) {
     var inputValue = document.querySelector("input#chatbox-1");
     var message = inputValue.value;
@@ -151,7 +170,7 @@ $(document).ready(function () {
       if (avatar !== "profile-picture-default.jpg") {
         html = `<li class="message-container">
         <div class="photo" style="background-image: url(/images/${avatar});"
-         data-bs-toggle="tooltip" data-bs-placement="top" title="${username}">
+         data-bs-toggle="tooltip" data-bs-placement="top" title="${fromUserName}">
          
           </div> 
         <div class="text-left d-inline-block">${message}</div>
@@ -168,6 +187,10 @@ $(document).ready(function () {
 
       $(ul).append(html);
     }
+  });
+
+  socket.on("room-message:notification-join", ({ newUser }) => {
+    console.log(`${newUser} joined`);
   });
 
   socket.on("private-message:response", ({ from, message }) => {
@@ -237,7 +260,7 @@ $(document).ready(function () {
     })
       .done(function (data) {
         console.log(data);
-        showMessages(data);
+        showMessages(data.rows, data.receiverId);
       })
       .fail(function (err) {
         console.log(err);
@@ -247,13 +270,41 @@ $(document).ready(function () {
       });
   }
 
-  function showMessages({ rows, receiverId }) {
-    let id = `#tab-${receiverId}`;
+  function loadRoomMesssages(groupId) {
+    if (!groupId) {
+      return alert("Group id is invalid");
+    }
+    $.ajax({
+      url: "loadRoomMessages",
+      dataType: "json",
+      method: "POST",
+      timeout: 5000,
+      data: {
+        groupId,
+      },
+      beforeSend: function () {
+        showLoading();
+      },
+    })
+      .done(function (data) {
+        console.log(data);
+        showMessages(data.rows, data.groupId);
+      })
+      .fail(function (err) {
+        console.log(err);
+      })
+      .always(function () {
+        hideLoading();
+      });
+  }
+
+  function showMessages(rows, userId) {
+    let id = `#tab-${userId}`;
     let ul = $(id);
 
     if (rows.length > 0 && $(ul).length > 0) {
-      rows.forEach(({ text, fromUser, toUser }) => {
-        let html = displayOneMessgae(text, fromUser, receiverId);
+      rows.forEach(({ text, fromUser }) => {
+        let html = displayOneMessage(text, fromUser, userId);
         $(ul).append(html);
       });
     }

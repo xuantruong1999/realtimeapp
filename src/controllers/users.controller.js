@@ -5,7 +5,10 @@ const { unlink } = require("node:fs/promises");
 const ObjectId = require("mongoose").Types.ObjectId;
 const fs = require("fs");
 const { Group } = require("../models/chat.model");
-const { MessageViewModel } = require("../viewmodels/user.view.model");
+const {
+  MessageViewModel,
+  MessageRoomViewModel,
+} = require("../viewmodels/user.view.model");
 
 const index = async (req, res, next) => {
   try {
@@ -140,7 +143,7 @@ const loadPrivateMessages = async function (req, res, next) {
   var isAjaxRequest = req.xhr;
   var { user1 } = req.body;
   var user2 = req.session.user.id;
-  console.log(`load messaege: username body: ${req.body.username}`);
+  console.log(`load private messages: ${req.body.username}`);
 
   if (!isAjaxRequest || !user1 || !user2) {
     return res.status(400).end();
@@ -168,12 +171,22 @@ const loadPrivateMessages = async function (req, res, next) {
         "username profile.avatar"
       ).exec();
 
+      let from = {
+        fromUserName: fromUser.username,
+        id: fromUser.id,
+        avatar: fromUser.profile.avatar,
+      };
+
       let toUser = await UserModel.findById(
         message.receiverId,
         "username"
       ).exec();
 
-      result.rows.push(new MessageViewModel(message.text, fromUser, toUser));
+      let to = {
+        fromUserName: toUser.username,
+      };
+
+      result.rows.push(new MessageViewModel(message.text, from, to));
     }
     console.log(
       `load messaege: user1: ${user1}--user2: ${user2} total messages: `,
@@ -186,4 +199,41 @@ const loadPrivateMessages = async function (req, res, next) {
   res.json(result);
 };
 
-module.exports = { index, update, chatMessage, loadPrivateMessages };
+const loadRoomMessages = async function (req, res, next) {
+  var isAjaxRequest = req.xhr;
+  var { groupId } = req.body;
+  console.log(`load room messages: ${groupId}`);
+
+  if (!isAjaxRequest || !groupId) {
+    return res.status(400).end();
+  }
+
+  var result = { rows: [], groupId: groupId };
+
+  Message.find({ groupId: groupId })
+    .populate("senderId")
+    .exec()
+    .then(function (messages) {
+      console.log("data: ", messages);
+      messages.forEach((element) => {
+        let user = element.senderId;
+        let from = {
+          fromUserName: user.username,
+          id: user.id,
+          avatar: user.profile.avatar,
+        };
+
+        result.rows.push(new MessageRoomViewModel(element.text, from));
+      });
+      result.groupId = groupId;
+      res.json(result);
+    });
+};
+
+module.exports = {
+  index,
+  update,
+  chatMessage,
+  loadPrivateMessages,
+  loadRoomMessages,
+};

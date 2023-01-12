@@ -55,7 +55,7 @@ app.use(
 
 //Specified for development env
 if (process.env.ENV === "Development") {
-  app.use(morgan("combined"));
+  //app.use(morgan("combined"));
 }
 app.use(compression());
 

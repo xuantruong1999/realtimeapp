@@ -21,22 +21,22 @@ function reduceNickNameString(nickname = "") {
   return nickname;
 }
 
-function displayOneMessgae(text, fromUser, receiverId) {
+function displayOneMessage(text, fromUser, receiverId) {
   let html = "";
-  if (fromUser._id == receiverId) {
-    if (fromUser.profile.avatar !== "profile-picture-default.jpg") {
+  let name = getCookie("name");
+  if (fromUser.fromUserName !== name) {
+    if (fromUser.avatar !== "profile-picture-default.jpg") {
       html = `<li class="message-container">
-      <div class="photo" style="background-image: url(/images/${fromUser.profile.avatar});"
-       data-bs-toggle="tooltip" data-bs-placement="top" title="${fromUser.username}">
-       
+      <div class="photo" style="background-image: url(/images/${fromUser.avatar});"
+       data-bs-toggle="tooltip" data-bs-placement="top" title="${fromUser.fromUserName}">
         </div> 
       <div class="text-left d-inline-block">${text}</div>
     </li>`;
     } else {
       html = `<li class="message-container">
       <div class="nickname"  data-bs-toggle="tooltip" data-bs-placement="top" title="${
-        fromUser.username
-      }">${reduceNickNameString(fromUser.username)}
+        fromUser.fromUserName
+      }">${reduceNickNameString(fromUser.fromUserName)}
         </div> 
       <div class="text-left d-inline-block">${text}</div>
     </li>`;

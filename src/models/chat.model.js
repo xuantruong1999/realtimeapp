@@ -29,7 +29,7 @@ const MessageSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    groupId: { type: mongoose.Schema.Types.Object, ref: "Group" },
+    groupId: { type: mongoose.Schema.Types.ObjectId, ref: "Group" },
     active: { type: Boolean, default: true },
   },
   { timestamps: true }
