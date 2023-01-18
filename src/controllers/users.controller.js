@@ -158,32 +158,25 @@ const loadPrivateMessages = async function (req, res, next) {
     },
     "id receiverId senderId text"
   )
+    .populate("senderId")
+    .populate("receiverId")
     .sort({ createdAt: 1 })
     .exec();
 
   const handleListMessage = async function (messages) {
     let result = { rows: [], receiverId: user1 };
     for (const message of messages) {
-      //console.log("start looping...");
-
-      let fromUser = await UserModel.findById(
-        message.senderId,
-        "username profile.avatar"
-      ).exec();
+      let sender = message.senderId;
 
       let from = {
-        fromUserName: fromUser.username,
-        id: fromUser.id,
-        avatar: fromUser.profile.avatar,
+        fromUserName: sender.username,
+        id: sender.id,
+        avatar: sender.profile.avatar,
       };
 
-      let toUser = await UserModel.findById(
-        message.receiverId,
-        "username"
-      ).exec();
-
+      let receiver = message.receiverId;
       let to = {
-        fromUserName: toUser.username,
+        fromUserName: receiver.username,
       };
 
       result.rows.push(new MessageViewModel(message.text, from, to));

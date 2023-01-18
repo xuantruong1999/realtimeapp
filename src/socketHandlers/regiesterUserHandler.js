@@ -56,8 +56,8 @@ module.exports = (io, socket) => {
       };
 
       await saveMessage(message, user.id, "", groupId);
-
-      return io.to(groupId).emit("room-message:response", {
+      console.log("groups: ", io.sockets.adapter.rooms);
+      return io.in(groupId).emit("room-message:response", {
         message,
         groupId,
         from,

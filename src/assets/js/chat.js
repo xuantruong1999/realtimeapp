@@ -31,7 +31,7 @@ $(document).ready(function () {
                             ${user.username} <br>
                             <span class="icon-online"> </span>
                             <span>Online</span>
-                            </button>
+                          </button>
                             <span class="badge d-none">0</span>
                         </li>`;
 
@@ -44,6 +44,7 @@ $(document).ready(function () {
             }
           }
         });
+
         userSelects.innerHTML = listLi;
 
         let loading = "";
@@ -56,7 +57,7 @@ $(document).ready(function () {
       }
     }
 
-    $("ul.tab-pane").each((index, val) => {
+    $("#right-block-1 ul.tab-pane").each((index, val) => {
       let id = $(val).attr("id");
       let userId = id.split("-")[1] || "";
       if (userId) {
@@ -73,17 +74,23 @@ $(document).ready(function () {
     setOffLine(socketId);
   });
 
+  //handle when user selecte a list item
   $("#user-selection").on("click", "li.itemSelect", function (event) {
     let liSelected = event.currentTarget;
     groupId = $(liSelected).attr("data-group-id");
     if (groupId) {
+      //group chat process
       $("#right-block-2").removeClass("d-none");
       $("#right-block-1").addClass("d-none");
+      clearTabpane("#right-block-1");
       let brand = $(liSelected).children("button").first()?.text();
       $("#brand").text(brand?.toLocaleUpperCase());
     } else {
+      //private message
+
       $("#right-block-1").removeClass("d-none");
       $("#right-block-2").addClass("d-none");
+      clearTabpane("#right-block-2", true);
       to = { toSocketId: "", toUserName: "", receiverId: "" }; //reset
       to.toSocketId = $(liSelected).attr("data-id");
       to.receiverId = $(liSelected).attr("receiverId");
@@ -154,6 +161,22 @@ $(document).ready(function () {
     console.log("message: =================> ", message);
     console.log("groupId: =================> ", groupId);
     console.log("from: =================> ", from);
+
+    let id = `#tab-${groupId}`;
+    let checkActive = $(id)?.hasClass("active");
+    if (!checkActive) {
+      //turn on badge notification
+      let badge = $("li[data-group-id=" + groupId + "]").children(".badge");
+      if (badge.length > 0) {
+        let numMess = $(badge).text();
+        numMess = Number.parseInt(numMess) || 0;
+        numMess++;
+        if (numMess !== 0) {
+          $(badge).text(numMess).removeClass("d-none");
+        }
+      }
+    }
+
     let ul = $(`#tab-${groupId}`);
     if ($(ul).length > 0) {
       var { fromUserName, senderId, avatar } = from;
@@ -262,8 +285,8 @@ $(document).ready(function () {
         console.log(data);
         showMessages(data.rows, data.receiverId);
       })
-      .fail(function (err) {
-        console.log(err);
+      .fail(function () {
+        console.log("err in function loadPrivateMessages");
       })
       .always(function () {
         hideLoading();
@@ -290,8 +313,8 @@ $(document).ready(function () {
         console.log(data);
         showMessages(data.rows, data.groupId);
       })
-      .fail(function (err) {
-        console.log(err);
+      .fail(function () {
+        console.log("load room messages failed: ", err.message);
       })
       .always(function () {
         hideLoading();
@@ -318,12 +341,23 @@ $(document).ready(function () {
     $(".preloader").hide();
   }
 
-  function clearTabpane() {
-    $("ul.tab-pane").each((index, value) => {
-      if ($(value).hasClass("active show")) {
-        $(value).removeClass("active show");
-      }
-    });
+  function clearTabpane(block = "", isFriendBlock = false) {
+    if (isFriendBlock) {
+      $("#friend li button.active").each(function (index, value) {
+        if ($(value).hasClass("active")) {
+          $(value).removeClass("active");
+        }
+      });
+    }
+    // $(`${block} ul.tab-pane`).each((index, value) => {
+    //   if ($(value).hasClass("active")) {
+    //     $(value).removeClass("active");
+    //   }
+
+    //   if ($(value).hasClass("show")) {
+    //     $(value).removeClass("show");
+    //   }
+    // });
   }
 
   function setOffLine(socketId) {

@@ -22,6 +22,7 @@ block layout-content
                         for group in groups 
                             li.itemSelect.pl-2.py-2.w-100(data-group-id=`${group.id}`)
                                 button.d-block(data-bs-target=`#tab-${group.id}` data-bs-toggle="tab" type="button" aria-selected="false" role="tab" aria-controls=`tab-${group.id}`)=group.name.toString()
+                                span.badge.d-none 0 
         #right-block-1.col-xs-12.col-sm-9.col-md-9.px-0.h-xs-50.d-none
             div#private-messages-box.tab-content.border
             form.form-chat
