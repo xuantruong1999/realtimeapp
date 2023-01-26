@@ -21,7 +21,7 @@ $(document).ready(function () {
         //generate list friend user vs tab content combine,showing private messages
         users.forEach((user, index) => {
           if (user.username !== username) {
-            listLi += `<li class="itemSelect custome-border"
+            listLi += `<li class="itemSelect custome-border" group="false"
                           data-id="${user.socketId}" data-avatar="${user.avatar}" data-username="${user.username}" receiverId="${user.userId}">
                           <button class="d-block"
                             data-bs-target="#tab-${user.userId}" 
@@ -77,20 +77,21 @@ $(document).ready(function () {
   //handle when user selecte a list item
   $("#user-selection").on("click", "li.itemSelect", function (event) {
     let liSelected = event.currentTarget;
-    groupId = $(liSelected).attr("data-group-id");
-    if (groupId) {
+    let check = $(liSelected).attr("group") == "false";
+    if (!check) {
       //group chat process
+      clearTabpane(true);
+      groupId = $(liSelected).attr("receiverId");
       $("#right-block-2").removeClass("d-none");
       $("#right-block-1").addClass("d-none");
-      clearTabpane("#right-block-1");
       let brand = $(liSelected).children("button").first()?.text();
       $("#brand").text(brand?.toLocaleUpperCase());
     } else {
       //private message
-
+      clearTabpane();
       $("#right-block-1").removeClass("d-none");
       $("#right-block-2").addClass("d-none");
-      clearTabpane("#right-block-2", true);
+
       to = { toSocketId: "", toUserName: "", receiverId: "" }; //reset
       to.toSocketId = $(liSelected).attr("data-id");
       to.receiverId = $(liSelected).attr("receiverId");
@@ -114,7 +115,7 @@ $(document).ready(function () {
       .first()
       .one("click", function () {
         console.log("this: ", this);
-        let id = $(this).attr("data-group-id");
+        let id = $(this).attr("receiverId");
 
         if (id) {
           socket.emit("join", id);
@@ -151,6 +152,13 @@ $(document).ready(function () {
   $("#btn-chatbox-2").click(function (event) {
     let value = $("input#chatbox-2").val();
     if (value) {
+      let html = "";
+      let ul = $(`#tab-${groupId}`);
+      html = `<li class="message-container-right">
+                  <div class="text-right d-inline-block">${value}</div>
+                </li>`;
+      $(ul).append(html);
+
       socket.emit("room-message:post", { message: value, groupId: groupId });
     }
     $("input#chatbox-2").val("");
@@ -158,15 +166,13 @@ $(document).ready(function () {
   });
 
   socket.on("room-message:response", function ({ message, groupId, from }) {
-    console.log("message: =================> ", message);
-    console.log("groupId: =================> ", groupId);
-    console.log("from: =================> ", from);
+    var checkActive = $("li[receiverId=" + groupId + "]")
+      .children("button")
+      .first();
 
-    let id = `#tab-${groupId}`;
-    let checkActive = $(id)?.hasClass("active");
-    if (!checkActive) {
+    if (!$(checkActive).hasClass("active")) {
       //turn on badge notification
-      let badge = $("li[data-group-id=" + groupId + "]").children(".badge");
+      let badge = $("li[receiverId=" + groupId + "]").children(".badge");
       if (badge.length > 0) {
         let numMess = $(badge).text();
         numMess = Number.parseInt(numMess) || 0;
@@ -181,14 +187,6 @@ $(document).ready(function () {
     if ($(ul).length > 0) {
       var { fromUserName, senderId, avatar } = from;
       let html = "";
-
-      if (fromUserName === username) {
-        html = `<li class="message-container-right">
-                  <div class="text-right d-inline-block">${message}</div>
-                </li>`;
-        $(ul).append(html);
-        return;
-      }
 
       if (avatar !== "profile-picture-default.jpg") {
         html = `<li class="message-container">
@@ -214,15 +212,10 @@ $(document).ready(function () {
 
   socket.on("room-message:notification-join", ({ newUser }) => {
     console.log(`${newUser} joined`);
+    alert(`${newUser} joined in general group`);
   });
 
   socket.on("private-message:response", ({ from, message }) => {
-    if (to.receiverId) {
-      clearTabpane();
-      let ulActive = $(`ul#tab-${to.receiverId}`);
-      if ($(ulActive).length > 0) $(ulActive).toggleClass('active show"');
-    }
-
     var tabPanelsenderId = $(`#tab-${from.senderId}`);
 
     if ($(tabPanelsenderId).length > 0) {
@@ -247,8 +240,9 @@ $(document).ready(function () {
       $(tabPanelsenderId).append(html);
 
       if (from.senderId) {
-        let id = `#tab-${from.senderId}`;
-        let checkActive = $(id)?.hasClass("active");
+        let checkActive = $(
+          `li[receiverId="${from.senderId}"] button`
+        )?.hasClass("active");
         if (!checkActive) {
           //turn on badge notification
           let badge = $("li[data-username=" + from.fromUserName + "]").children(
@@ -341,23 +335,20 @@ $(document).ready(function () {
     $(".preloader").hide();
   }
 
-  function clearTabpane(block = "", isFriendBlock = false) {
+  function clearTabpane(isFriendBlock = false) {
     if (isFriendBlock) {
       $("#friend li button.active").each(function (index, value) {
         if ($(value).hasClass("active")) {
           $(value).removeClass("active");
         }
       });
+    } else {
+      $("#group li button.active").each(function (index, value) {
+        if ($(value).hasClass("active")) {
+          $(value).removeClass("active");
+        }
+      });
     }
-    // $(`${block} ul.tab-pane`).each((index, value) => {
-    //   if ($(value).hasClass("active")) {
-    //     $(value).removeClass("active");
-    //   }
-
-    //   if ($(value).hasClass("show")) {
-    //     $(value).removeClass("show");
-    //   }
-    // });
   }
 
   function setOffLine(socketId) {

@@ -17,10 +17,10 @@ block layout-content
                 div.p-2.title.custome-border 
                     i.fa-solid.fa-user-group 
                     span(style="margin-left: 5px") CHANNELS
-                ul.p-0(role="tablist")
+                ul#group.p-0(role="tablist")
                     if groups 
                         for group in groups 
-                            li.itemSelect.pl-2.py-2.w-100(data-group-id=`${group.id}`)
+                            li.itemSelect.pl-2.py-2.w-100(receiverId=`${group.id}` )
                                 button.d-block(data-bs-target=`#tab-${group.id}` data-bs-toggle="tab" type="button" aria-selected="false" role="tab" aria-controls=`tab-${group.id}`)=group.name.toString()
                                 span.badge.d-none 0 
         #right-block-1.col-xs-12.col-sm-9.col-md-9.px-0.h-xs-50.d-none

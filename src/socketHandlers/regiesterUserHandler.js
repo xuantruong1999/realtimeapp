@@ -24,8 +24,6 @@ module.exports = (io, socket) => {
       console.log(`to: ${to.toUserName}`);
       console.log(`rooms: `, socket.rooms);
       io.to(to.toSocketId).emit("private-message:response", {
-        // same with io.sockets.to(to.toSocketId)
-
         from: { fromUserName: socket.username, senderId },
         to,
         message,
@@ -57,7 +55,7 @@ module.exports = (io, socket) => {
 
       await saveMessage(message, user.id, "", groupId);
       console.log("groups: ", io.sockets.adapter.rooms);
-      return io.in(groupId).emit("room-message:response", {
+      return socket.to(groupId).emit("room-message:response", {
         message,
         groupId,
         from,
