@@ -20,7 +20,7 @@ module.exports = (io, socket) => {
 
       var groupName = arr[0] + "-with-" + arr[1]; // always unique group name
 
-      socket.join(groupName); //socket.rooms = [socket.id, username1-with-username2]
+      socket.join(groupName); //socket.rooms = socket.id => {socket.id, username1-with-username2}
       console.log(`to: ${to.toUserName}`);
       console.log(`rooms: `, socket.rooms);
       io.to(to.toSocketId).emit("private-message:response", {
@@ -70,9 +70,37 @@ module.exports = (io, socket) => {
     });
   };
 
+  const typingShow = async function ({ type, to }) {
+    //  var to = { toSocketId: "", toUserName: "", receiverId: "" };
+    if (type == "private") {
+      io.to(to.toSocketId).emit("typing-private-chat-show", {
+        usernameTyping: socket.username,
+      });
+    } else if (type == "group") {
+      socket
+        .to(to.receiverId)
+        .emit("typing-group-show", { usernameTyping: socket.username });
+    }
+  };
+
+  const typingHide = async function ({ type, to }) {
+    //  var to = { toSocketId: "", toUserName: "", receiverId: "" };
+    if (type == "private") {
+      io.to(to.toSocketId).emit("typing-private-chat-hide", {
+        usernameTyping: socket.username,
+      });
+    } else if (type == "group") {
+      socket
+        .to(to.receiverId)
+        .emit("typing-group-hide", { usernameTyping: socket.username });
+    }
+  };
+
   socket.on("private-message:post", privateMessage);
   socket.on("room-message:post", roomMessage);
   socket.on("join", joinGroup);
+  socket.on("typing-show", typingShow);
+  socket.on("typing-hide", typingHide);
 };
 
 const saveMessage = async function (message, senderId, receiverId, groupId) {

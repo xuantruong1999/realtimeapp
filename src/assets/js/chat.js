@@ -84,6 +84,8 @@ $(document).ready(function () {
       groupId = $(liSelected).attr("receiverId");
       $("#right-block-2").removeClass("d-none");
       $("#right-block-1").addClass("d-none");
+      to = { toSocketId: "", toUserName: "", receiverId: "" }; //reset
+      to.receiverId = groupId;
       let brand = $(liSelected).children("button").first()?.text();
       $("#brand").text(brand?.toLocaleUpperCase());
     } else {
@@ -147,6 +149,22 @@ $(document).ready(function () {
     }
 
     event.preventDefault();
+  });
+
+  $("#chatbox-1").focusin(function () {
+    typingIndicatorShow("private", to);
+  });
+
+  $("#chatbox-1").focusout(function () {
+    typingIndicatorHide("private", to);
+  });
+
+  $("#chatbox-2").focusin(function () {
+    typingIndicatorShow("group", to);
+  });
+
+  $("#chatbox-2").focusout(function () {
+    typingIndicatorHide("group", to);
   });
 
   $("#btn-chatbox-2").click(function (event) {
@@ -335,6 +353,14 @@ $(document).ready(function () {
     $(".preloader").hide();
   }
 
+  function typingIndicatorShow(type, to) {
+    return socket.emit("typing-show", { type, to });
+  }
+
+  function typingIndicatorHide(type, to) {
+    return socket.emit("typing-hide", { type, to });
+  }
+
   function clearTabpane(isFriendBlock = false) {
     if (isFriendBlock) {
       $("#friend li button.active").each(function (index, value) {
@@ -359,6 +385,40 @@ $(document).ready(function () {
       $(tagSpans).last().text("Offline");
     }
   }
+
+  socket.on("typing-private-chat-show", ({ usernameTyping }) => {
+    let span = $("#typing-private-chat .tiblock")
+      .children("span.list-username-typing")
+      .first();
+    if ($(span).text() === "") {
+      $(span).text(usernameTyping);
+    } else {
+      $(span).text().concat(",", usernameTyping);
+    }
+
+    $("#typing-private-chat").show();
+  });
+
+  socket.on("typing-group-show", ({ usernameTyping }) => {
+    let span = $("#typing-group-chat .tiblock")
+      .children("span.list-username-typing")
+      .first();
+    if ($(span).text() === "") {
+      $(span).text(" " + usernameTyping);
+    } else {
+      $(span).text().concat(", ", usernameTyping);
+    }
+
+    $("#typing-group-chat").show();
+  });
+
+  socket.on("typing-private-chat-hide", () => {
+    $("#typing-private-chat").hide();
+  });
+
+  socket.on("typing-group-hide", () => {
+    $("#typing-group-chat").hide();
+  });
 
   socket.on("connect_error", (err) => {
     document.write(

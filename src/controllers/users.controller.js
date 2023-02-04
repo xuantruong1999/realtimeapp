@@ -134,7 +134,6 @@ const chatMessage = function (req, res, next) {
     .select({ _id: 1, name: 1 })
     .exec(function (err, groups) {
       if (err) return next(err);
-      console.log("group: ", groups);
       res.render("users/chat.pug", { title: "Chat Message", res, groups });
     });
 };
@@ -207,7 +206,6 @@ const loadRoomMessages = async function (req, res, next) {
     .populate("senderId")
     .exec()
     .then(function (messages) {
-      console.log("data: ", messages);
       messages.forEach((element) => {
         let user = element.senderId;
         let from = {
