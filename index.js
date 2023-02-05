@@ -146,6 +146,7 @@ io.on("connection", onConnection);
 
 mongoose
   .connect(process.env.CONNECTION_URI, {
+    useNewUrlParser: true,
     connectTimeoutMS: 5000,
     socketTimeoutMS: 45000,
     dbName: "Mydb",
