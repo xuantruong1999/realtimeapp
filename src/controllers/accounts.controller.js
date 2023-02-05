@@ -43,29 +43,33 @@ const authen = async (req, res) => {
       helper.hasher(userInfor.password, user.salt) === user.password;
     if (isMatch) {
       req.session.user = { isAuth: true, id: user.id };
+      let options = {
+        expires: new Date(Date.now() + 24 * 7 * 3600000),
+        httpOnly: true,
+      };
 
-      res.cookie("name", user.username);
+      res.cookie("userId", user.id, options);
+
       if (userInfor.rememberme) {
         let token = helper.generateRandomToken();
         let userUpdated = await UserModel.findByIdAndUpdate(
           user.id,
-          { remembermeToken: token }, 
+          { remembermeToken: token },
           {
             new: true,
           }
         );
         //expired a week
-        let options = {
-          expires: new Date(Date.now() + 24 * 7 * 3600000),
-          httpOnly: true,
-        };
+
         res.cookie("remembermeToken", userUpdated.remembermeToken, options);
-        res.cookie("userId", userUpdated.id, options);
         res.cookie("name", user.username, {
           expires: new Date(Date.now() + 24 * 7 * 3600000),
+          httpOnly: false,
         });
-        
-        return res.render("home/index.pug", { username: userUpdated.username });
+
+        return res.render("home/index.pug", { username: user.username });
+      } else {
+        res.cookie("name", user.username);
       }
       res.render("home/index.pug", { username: user.username });
     } else {

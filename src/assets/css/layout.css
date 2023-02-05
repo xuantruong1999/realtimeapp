@@ -1,0 +1,19 @@
+.shadow{
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+
+#header{
+    /* min-height: 10vh; */
+}
+
+#main{
+    /* min-height: 60vh; */
+    margin:30px 0px;
+
+}
+#footer{
+    /* min-height: 30vh; */
+    color: #fff!important;
+    position: relative;
+    
+}

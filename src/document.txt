@@ -1,0 +1,51 @@
+Requirements:
+1. Send messsages to other people
+2. Send messages to group members
+    create group
+    add members
+    remove member
+3. Can see older messages
+    show history messages
+    - show messages user with other user
+    - show messages in a group_member
+
+4. Type messages
+5. add friends -- 
+
+================================================================
+design database
+
+Users, Messages, Room, PrivateMessages
+
+1/ Users - Room (n-m)
+
+    Room {
+        _id: _object_id
+        name: string
+        timestamps: true
+    }
+
+    room_user {
+        room_id: _object_id (FK)
+        UserID (FK)
+        timestamps: true
+    }
+2/ Room - Messages(1 - n)
+
+    Messages {
+        _id: _object_id
+        userID: _object_id
+        room_id: _object_id
+        timestamps: true
+        text: string
+    }
+3/ Users - PrivateMessages (1 - n)
+
+    PrivateMessages {
+        _id: _object_id
+        SenderId: _object_id
+        ReceiverId: _object_id
+        MessageId: _object_id
+    }
+
+4/ PrivateMessages 1-1 Messages

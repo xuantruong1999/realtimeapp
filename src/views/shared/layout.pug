@@ -2,22 +2,25 @@ doctype html
 html(lang="en")
     head
         meta(charset="UTF-8")
-        meta(http-equiv="X-UA-Compatible", content="IE=edge")
-        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        meta(http-equiv="X-UA-Compatible" content="IE=edge")
+        meta(name="viewport" content="width=device-width, initial-scale=1.0")
         title #{title}
         link(rel="stylesheet" href="/css/bootstrap.min.css")
-        block styles 
-        block head 
+        link(rel="stylesheet" href="/assets/css/layout.css")
+        script(src="/jquery/jquery.min.js")
+        script(src="/js/bootstrap.bundle.min.js")
+    block styles 
+    block head 
     body 
-        div#root.container.py-3
+        div#root.container-fluid
             #headers
                 include header.pug
             #main
                 block layout-content
-            #footer 
+            footer#footer
                 include footer.pug
 
         //--= add javascription bootstrap and jquery
     block scripts
-        script(src="/js/bootstrap.bundle.min.js")
         script(src="https://kit.fontawesome.com/bb3f1cf496.js" crossorigin="anonymous")
+        script(src="/assets/js/common.js")
