@@ -243,3 +243,11 @@ ul.messages {
     -webkit-animation-delay:400ms;
 }
 
+@media(max-width: 576px) {
+    #chat{
+        height: auto;
+    }
+    #user-selection{
+        height: auto;
+    }
+}
