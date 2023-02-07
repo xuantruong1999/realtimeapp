@@ -390,12 +390,7 @@ $(document).ready(function () {
     let span = $("#typing-private-chat .tiblock")
       .children("span.list-username-typing")
       .first();
-    if ($(span).text() === "") {
-      $(span).text(usernameTyping);
-    } else {
-      $(span).text().concat(",", usernameTyping);
-    }
-
+    $(span).text(usernameTyping);
     $("#typing-private-chat").show();
   });
 
