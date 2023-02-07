@@ -8,6 +8,7 @@ function MessageRoomViewModel(text = "", fromUser = "", toGroup = "") {
   this.text = text;
   this.fromUser = fromUser;
 }
+
 module.exports = {
   MessageViewModel,
   MessageRoomViewModel,
