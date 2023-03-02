@@ -19,7 +19,9 @@ const authenMiddware = async (req, res, next) => {
       return next();
     }
   }
-  return res.status(401).send("Unauthorized, Please login again");
+  return res
+    .status(401)
+    .send('Unauthorized, Please <a href="/account/login">login<a/> again');
 };
 module.exports = {
   authenMiddware,

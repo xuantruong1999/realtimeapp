@@ -49,3 +49,12 @@ function displayOneMessage(text, fromUser, receiverId) {
 
   return html;
 }
+
+function scrollBottom(idBlock) {
+  if (
+    idBlock &&
+    idBlock === "#room-messages-box" &&
+    idBlock === "#private-messages-box"
+  )
+    $(idBlock).scrollTop($(idBlock)[0].scrollHeight);
+}

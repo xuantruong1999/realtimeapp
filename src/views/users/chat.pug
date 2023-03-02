@@ -23,7 +23,7 @@ block layout-content
                             li.itemSelect.pl-2.py-2.w-100(receiverId=`${group.id}` )
                                 button.d-block(data-bs-target=`#tab-${group.id}` data-bs-toggle="tab" type="button" aria-selected="false" role="tab" aria-controls=`tab-${group.id}`)=group.name.toString()
                                 span.badge.d-none 0 
-        #right-block-1.col-xs-12.col-sm-9.col-md-9.px-0.h-xs-50.d-none
+        #right-block-1.col-xs-12.col-sm-9.col-md-9.px-0.h-xs-50.d-none.position-relative
             div#private-messages-box.tab-content.border
             #typing-private-chat.ticontainer.border-bottom  
                 .tiblock
@@ -36,7 +36,10 @@ block layout-content
                 div.form-group.d-flex.mx-auto.w-50.mt-3
                     input.form-control#chatbox-1(type="text" style="margin-right: 10px;") 
                     button#btn-chatbox-1.btn.btn-primary(type="submit") Send 
-        #right-block-2.col-xs-12.col-sm-9.col-md-9.px-0.h-xs-50.d-none
+            .scroll-btn.rounded-circle.border.d-flex.justify-content-center.align-items-center.position-absolute(style="height: 50px; width: 50px; bottom: 100px; right: 42px; background: blue; opacity: 0.5") 
+                span.text-light 
+                    i.fas.fa-angle-down
+        #right-block-2.col-xs-12.col-sm-9.col-md-9.px-0.h-xs-50.d-none.position-relative
             div#room-messages-box.tab-content.border
                 if groups 
                     for group in groups
@@ -52,6 +55,9 @@ block layout-content
                 div.form-group.d-flex.mx-auto.w-50.mt-3
                     input.form-control#chatbox-2(type="text" style="margin-right: 10px;") 
                     button#btn-chatbox-2.btn.btn-primary(type="submit") Send
+            .scroll-btn.rounded-circle.border.d-flex.justify-content-center.align-items-center.position-absolute(style="height: 50px; width: 50px; bottom: 100px; right: 42px; background: blue; opacity: 0.5") 
+                span.text-light 
+                    i.fas.fa-angle-down
     script(src="/socket.io/socket.io.js" type="text/javascript")
     script(src="/assets/js/chat.js")
 

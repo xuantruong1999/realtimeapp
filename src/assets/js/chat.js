@@ -279,6 +279,12 @@ $(document).ready(function () {
     }
   });
 
+  $(".scroll-btn").click(function (event) {
+    debugger;
+    let idBlock = event.target.parentNode;
+    scrollBottom(idBlock);
+  });
+
   function loadPrivateMessages(user1) {
     $.ajax({
       url: "loadPrivateMessages",
